@@ -133,8 +133,6 @@ def main():
             st.write('Your BMR  is :',round(bmr1,2))
             data=(uid,Age,Weight,Height,bmi1,bmr1,bf2,bf1)
             run_query(data)
-            conn.commit()
-            conn.close()
         #bmr2=bmr1
         
     #if selected=="Best suitable diet for you":
