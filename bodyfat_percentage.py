@@ -13,19 +13,6 @@ from streamlit_option_menu import option_menu
 import uuid
 from sklearn.linear_model import LinearRegression
 import mysql.connector
-@st.cache_resource
-def init_connection():
-    return mysql.connector.connect(**st.secrets["mysql"])
-
-conn = init_connection()
-
-# Perform query.
-# Uses st.cache_data to only rerun when the query changes or after 10 min.
-@st.cache_data(ttl=600)
-def run_query(query):
-    with conn.cursor() as cur:
-        cur.execute(query)
-        return conn.commit()
 den=pickle.load(open("den_pred.sav",'rb'))
 bfper=pickle.load(open("bf_pred.sav",'rb'))
 
@@ -104,6 +91,19 @@ def main():
         options=["Predicting Bodyfat percent","Best suitable diet for you"],
         orientation="horizontal"
         )
+    @st.cache_resource
+    def init_connection():
+        return mysql.connector.connect(**st.secrets["mysql"])
+
+    conn = init_connection()
+
+    # Perform query.
+    # Uses st.cache_data to only rerun when the query changes or after 10 min.
+    @st.cache_data(ttl=600)
+    def run_query(query):
+        with conn.cursor() as cur:
+            cur.execute(query)
+            return conn.commit()
     if selected=="Predicting Bodyfat percent":
         uid=uuid.uuid4()
         uid=uid.time
