@@ -91,12 +91,31 @@ def main():
         options=["Predicting Bodyfat percent","Best suitable diet for you"],
         orientation="horizontal"
         )
-    @st.cache_data(ttl=600)
+    @st.cache_resource
     def init_connection():
         return mysql.connector.connect(**st.secrets["mysql"])
-    conn = init_connection()
 
+    conn = init_connection()
     # Perform query.
+    @st.cache_data(ttl=600)
+    def insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
+    # Initialize the database connection
+        conn = init_connection()
+
+    # Define the SQL query to insert the data
+        sql_query = "INSERT INTO user_input (id, Age, Weight, Height, bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        data = (uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+
+    # Execute the query to insert the data
+        mycursor = conn.cursor()
+        mycursor.execute(sql_query, data)
+        conn.commit()
+
+    # Close the database connection
+        conn.close()
+
+    # Return a success message
+        return "Data inserted successfully!"
     
 
     mycursor=conn.cursor()
@@ -126,11 +145,9 @@ def main():
             st.write('Your BMI is :',round(bmi1,1))
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
-            sql_query = "INSERT INTO user_input (id, Age, Weight, Height,bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-            data=(uid,Age,Weight,Height,bmi1,bmr1,bf2,bf1)
-            mycursor.execute(sql_query,data)
-            conn.commit()
-            conn.close()
+            insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+            
+
         #bmr2=bmr1
         
     #if selected=="Best suitable diet for you":
