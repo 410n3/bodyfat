@@ -37,7 +37,7 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Bic
     height=height*2.54 #cms
     weight=weight/2.205 #kgs
     bmi=weight/(height/100)**2
-    bf=1.20*bmi+0.23*int(Age)-16.2
+    bf=1.20*bmi+0.23*Age-16.2
     if bmi <= 18.5:  
         if bf > prediction2[0]:  
             conclusion = bf - prediction2[0]
@@ -83,7 +83,7 @@ def main():
         id=id.time
         st.header("Predicting your bodyfat percentage")
         gender = st.radio("Select your gender", ("Male", "Female"))
-        Age=st.text_input("Enter your age: ")
+        Age=st.number_input("Enter your age:", value=0, format="%d")
         Weight=st.number_input("Enter your weight in pounds: ", format="%.1f")
         Height=st.number_input("Enter your height in inches : ", format="%.1f")
         Neck=st.number_input("Enter your neck in cm : ", format="%.1f")
