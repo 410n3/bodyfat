@@ -12,8 +12,20 @@ import math
 from streamlit_option_menu import option_menu
 import uuid
 from sklearn.linear_model import LinearRegression
+import mysql.connector
 den=pickle.load(open("den_pred.sav",'rb'))
 bfper=pickle.load(open("bf_pred.sav",'rb'))
+@st.cache_resource
+def init_connection():
+    return mysql.connector.connect(**st.secrets["mysql"])
+
+conn = init_connection()
+@st.cache_data(ttl=600)
+def run_query(query):
+    with conn.cursor() as cur:
+        cur.execute(query)
+        return cur.fetchall()
+
 def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist):
     # Calculating body fat percentage for males
     height=float(Height)
@@ -29,7 +41,6 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Bic
     elif gender == "Female":
         body_fat_perc = 495 / (1.29579 - 0.35004 * (math.log10(Abdomen + Hip - Neck)) + 0.22100 * (math.log10(Height))) - 450
         bmr=(9.247*weight) + (3.098*height) - (4.330*Age) + 447.593
-
     else:
         return "Invalid input. Please enter M or F for gender."
     user_update=[[body_fat_perc,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist]]
@@ -46,31 +57,39 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Bic
         if bf > prediction2[0]:  
             conclusion = bf - prediction2[0]
             conclusion = round(conclusion, 0)
-            return "Body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
+            bf1=round(prediction2[0] + conclusion,3)
+            return bf1,bmi,bf,bmr
         else:
             conclusion = prediction2[0] - bf
             conclusion = round(conclusion, 0)
-            return "Body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
-    elif bmi <= 24.9:  
-            return "Body fat % is ", round(prediction2[0],3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
+            bf1=round(prediction2[0] + conclusion,3)
+            return bf1,bmi,bf,bmr
+    elif bmi <= 24.9:
+        bf1=round(prediction2[0],3)
+        return bf1,bmi,bf,bmr
+            
     elif bmi <= 29.9:  
             if bf > prediction2[0]:  
                 conclusion = bf - prediction2[0]
                 conclusion = round(conclusion, 0)
-                return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
+                bf1=round(prediction2[0] + conclusion,3)
+                return bf1,bmi,bf,bmr
             else:
                 conclusion = prediction2[0]-bf
                 conclusion = round(conclusion, 0)
-                return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
+                bf1=round(prediction2[0] + conclusion,3)
+                return bf1,bmi,bf,bmr
     else:  
                 if bf > prediction2[0]:  
                     conclusion = bf - prediction2[0]
                     conclusion = round(conclusion, 0)
-                    return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
+                    bf1=round(prediction2[0] + conclusion,3)
+                    return bf1,bmi,bf,bmr
                 else:
                     conclusion = prediction2[0] - bf
                     conclusion = round(conclusion, 0)
-                    return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
+                    bf1=round(prediction2[0] + conclusion,3)
+                    return bf1,bmi,bf,bmr
 def main():
     page_title="AI Bodyfat percentage calculator"
     page_icon=":chart_with_downwards_trend:"
@@ -101,12 +120,29 @@ def main():
         Forearm=st.number_input("Enter your forearm in cm : ", format="%.1f")
         Wrist=st.number_input("Enter your wrist in cm : ", format="%.1f")
         
-        userinput=''
         if st.button('Calculate Body fat percentage'):
-            userinput=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist)
-        st.success(userinput)
-    #if selected=="Best suitable diet for you";
-        #ask adi
-
+            bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist)
+        st.write('Your Bodyfat percetage is :',round(bf2,2))
+        st.write('Your BMI is :',round(bmi1,1))
+        st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
+        st.write('Your BMR  is :',round(bmr1,2))
+        sql="INSERT INTO users (id, Age, Weight, Height, bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        val = (id, Age, Weight, Height, bmi1,bmr1,bf2,bf1)
+        run_query(sql,val)
+        #bmr2=bmr1
+        
+    #if selected=="Best suitable diet for you":
+        #bmr2=bmr1
+        # create radio button to select fitness goal
+        #fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
+        # display selected fitness goal
+        #if fitness_goal == "Weight Loss":
+         #   wl=bmr2-300
+          #  st.write("You have selected weight loss and your bmr is ",round(bmr2,2),"You have eat upto ",wl)
+        #elif fitness_goal == "Weight Gain":
+         #  wg=bmr2-300
+          # st.write("You have selected weight gain and your bmr is ",round(bmr2,2),"You have eat atleast ",wg)
+        #else:
+         #   st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2))
 if __name__=='__main__': 
     main()
