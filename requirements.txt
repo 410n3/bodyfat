@@ -1,4 +1,4 @@
-mysql_connector_repackaged==0.3.1
+mysql-connector-python==0.3.1
 numpy==1.21.5
 scikit_learn==1.2.1
 streamlit==1.18.1
