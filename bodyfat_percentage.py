@@ -18,13 +18,17 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Bic
     # Calculating body fat percentage for males
     height=float(Height)
     height=height*2.54
+    weight=float(Weight)
+    weight=weight*2.205
     body_fat_perc=0
+    bmr=0
     if gender == "Male":
         body_fat_perc= 495 / (1.0324 - 0.19077 * (math.log10(Abdomen - Neck)) + 0.15456 * (math.log10(height))) - 450
-
+        bmr = (3.397*weight)+ (4.799*height) - (5.677*Age) + 88.362
 # Calculating body fat percentage for females
     elif gender == "Female":
         body_fat_perc = 495 / (1.29579 - 0.35004 * (math.log10(Abdomen + Hip - Neck)) + 0.22100 * (math.log10(Height))) - 450
+        bmr=(9.247*weight) + (3.098*height) - (4.330*Age) + 447.593
 
     else:
         return "Invalid input. Please enter M or F for gender."
@@ -42,31 +46,31 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Bic
         if bf > prediction2[0]:  
             conclusion = bf - prediction2[0]
             conclusion = round(conclusion, 0)
-            return "Body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf)
+            return "Body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
         else:
             conclusion = prediction2[0] - bf
             conclusion = round(conclusion, 0)
-            return "Body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf)
+            return "Body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
     elif bmi <= 24.9:  
-            return "Body fat % is ", round(prediction2[0],3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf)
+            return "Body fat % is ", round(prediction2[0],3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
     elif bmi <= 29.9:  
             if bf > prediction2[0]:  
                 conclusion = bf - prediction2[0]
                 conclusion = round(conclusion, 0)
-                return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Bodyfat % according to US-Navy: ",body_fat_perc
+                return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
             else:
                 conclusion = prediction2[0]-bf
                 conclusion = round(conclusion, 0)
-                return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Bodyfat % according to US-Navy: ",body_fat_perc
+                return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
     else:  
                 if bf > prediction2[0]:  
                     conclusion = bf - prediction2[0]
                     conclusion = round(conclusion, 0)
-                    return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf)
+                    return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
                 else:
                     conclusion = prediction2[0] - bf
                     conclusion = round(conclusion, 0)
-                    return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf)
+                    return "body fat % is ", round(prediction2[0] + conclusion,3),"Your BMI is :",round(bmi,2),"Bodyfat % according to BMI is : ", round(bf),"Your BMR is : ",round(bmr,2),"CL"
 def main():
     page_title="AI Bodyfat percentage calculator"
     page_icon=":chart_with_downwards_trend:"
