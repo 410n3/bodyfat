@@ -12,8 +12,23 @@ import math
 from streamlit_option_menu import option_menu
 import uuid
 from sklearn.linear_model import LinearRegression
+import mysql.connector
+@st.cache_resource
+def init_connection():
+    return mysql.connector.connect(**st.secrets["mysql"])
+
+conn = init_connection()
+
+# Perform query.
+# Uses st.cache_data to only rerun when the query changes or after 10 min.
+@st.cache_data(ttl=600)
+def run_query(query):
+    with conn.cursor() as cur:
+        cur.execute(query)
+        return conn.commit()
 den=pickle.load(open("den_pred.sav",'rb'))
 bfper=pickle.load(open("bf_pred.sav",'rb'))
+
 def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist):
     # Calculating body fat percentage for males
     height=float(Height)
@@ -90,8 +105,8 @@ def main():
         orientation="horizontal"
         )
     if selected=="Predicting Bodyfat percent":
-        id=uuid.uuid4()
-        id=id.time
+        uid=uuid.uuid4()
+        uid=uid.time
         st.header("Predicting your bodyfat percentage")
         gender = st.radio("Select your gender", ("Male", "Female"))
         Age=st.number_input("Enter your age:", value=0, format="%d")
@@ -114,6 +129,9 @@ def main():
             st.write('Your BMI is :',round(bmi1,1))
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
+            sql_query = "INSERT INTO mytable (id, Age, Weight, Height,bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            data=(uid,Age,Weight,Height,bmi1,bmr1,bf2,bf1)
+            run_query(sql_query,data)
         #bmr2=bmr1
         
     #if selected=="Best suitable diet for you":
