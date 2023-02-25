@@ -98,6 +98,7 @@ def main():
     conn = init_connection()
 
     # Perform query.
+    @st.cache_data(ttl=600)
     cursor1=conn.cursor()
 
     if selected=="Predicting Bodyfat percent":
