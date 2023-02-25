@@ -110,10 +110,10 @@ def main():
         
         if st.button('Calculate Body fat percentage'):
             bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist)
-        st.write('Your Bodyfat percetage is :',round(bf2,2))
-        st.write('Your BMI is :',round(bmi1,1))
-        st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
-        st.write('Your BMR  is :',round(bmr1,2))
+            st.write('Your Bodyfat percetage is :',round(bf2,2))
+            st.write('Your BMI is :',round(bmi1,1))
+            st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
+            st.write('Your BMR  is :',round(bmr1,2))
         #bmr2=bmr1
         
     #if selected=="Best suitable diet for you":
