@@ -98,7 +98,7 @@ def main():
     conn = init_connection()
 
     # Perform query.
-    @st.cache_data(ttl=600)
+    #@st.cache_data(ttl=600)
     def run_query(data):
         with conn.cursor() as cur:
             sql_query = "INSERT INTO user_input (id, Age, Weight, Height,bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
