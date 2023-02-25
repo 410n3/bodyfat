@@ -92,7 +92,7 @@ def main():
         orientation="horizontal"
         )
     @st.cache_resource
-    @st.cache_data(ttl=600)
+    #@st.cache_data(ttl=600)
     def init_connection():
         return mysql.connector.connect(**st.secrets["mysql"])
     conn = init_connection()
