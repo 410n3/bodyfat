@@ -98,13 +98,13 @@ def main():
     conn = init_connection()
 
     # Perform query.
-    #@st.cache_data(ttl=600)
+    @st.cache_data(ttl=600)
     def run_query(data):
         with conn.cursor() as cur:
             sql_query = "INSERT INTO user_input (id, Age, Weight, Height,bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             cur.execute(sql_query,data)
             conn.commit()
-            return conn.close()
+            return
 
     if selected=="Predicting Bodyfat percent":
         uid=uuid.uuid4()
@@ -133,6 +133,8 @@ def main():
             st.write('Your BMR  is :',round(bmr1,2))
             data=(uid,Age,Weight,Height,bmi1,bmr1,bf2,bf1)
             run_query(data)
+            conn.commit()
+            conn.close()
         #bmr2=bmr1
         
     #if selected=="Best suitable diet for you":
