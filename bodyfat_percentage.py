@@ -100,7 +100,7 @@ def main():
     # Perform query.
     # Uses st.cache_data to only rerun when the query changes or after 10 min.
     @st.cache_data(ttl=600)
-    cur=conn.cursor()
+    cursor1=conn.cursor()
 
     if selected=="Predicting Bodyfat percent":
         uid=uuid.uuid4()
@@ -129,7 +129,7 @@ def main():
             st.write('Your BMR  is :',round(bmr1,2))
             sql_query = "INSERT INTO mytable (id, Age, Weight, Height,bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             data=(uid,Age,Weight,Height,bmi1,bmr1,bf2,bf1)
-            cur.execute(sql_query,data)
+            cursor1.execute(sql_query,data)
             conn.commit()
             conn.close()
         #bmr2=bmr1
