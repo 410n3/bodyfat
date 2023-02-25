@@ -15,13 +15,7 @@ from sklearn.linear_model import LinearRegression
 import mysql.connector
 den=pickle.load(open("den_pred.sav",'rb'))
 bfper=pickle.load(open("bf_pred.sav",'rb'))
-@st.cache_resource
-def init_connection():
-    return mysql.connector.connect(**st.secrets["mysql"])
-conn = init_connection()
 
-    # Perform query.
-@st.cache_data(ttl=600)
 def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist):
     # Calculating body fat percentage for males
     height=float(Height)
@@ -97,7 +91,13 @@ def main():
         options=["Predicting Bodyfat percent","Best suitable diet for you"],
         orientation="horizontal"
         )
-    
+    @st.cache_resource
+    @st.cache_data(ttl=600)
+    def init_connection():
+        return mysql.connector.connect(**st.secrets["mysql"])
+    conn = init_connection()
+
+    # Perform query.
     mycursor=conn.cursor()
 
     if selected=="Predicting Bodyfat percent":
