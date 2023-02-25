@@ -12,20 +12,8 @@ import math
 from streamlit_option_menu import option_menu
 import uuid
 from sklearn.linear_model import LinearRegression
-import mysql.connector
 den=pickle.load(open("den_pred.sav",'rb'))
 bfper=pickle.load(open("bf_pred.sav",'rb'))
-@st.cache_resource
-def init_connection():
-    return mysql.connector.connect(**st.secrets["mysql"])
-
-conn = init_connection()
-@st.cache_data(ttl=600)
-def run_query(query):
-    with conn.cursor() as cur:
-        cur.execute(query)
-        return cur.fetchall()
-
 def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist):
     # Calculating body fat percentage for males
     height=float(Height)
@@ -126,9 +114,6 @@ def main():
         st.write('Your BMI is :',round(bmi1,1))
         st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
         st.write('Your BMR  is :',round(bmr1,2))
-        sql="INSERT INTO users (id, Age, Weight, Height, bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        val = (id, Age, Weight, Height, bmi1,bmr1,bf2,bf1)
-        run_query(sql,val)
         #bmr2=bmr1
         
     #if selected=="Best suitable diet for you":
