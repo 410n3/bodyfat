@@ -14,6 +14,10 @@ from sklearn.linear_model import LinearRegression
 import gspread
 import gspread_pandas as gspd
 from google.oauth2 import service_account
+from pandas import DataFrame
+from gsheetsdb import connect
+
+
 
 den=pickle.load(open("den_pred.sav",'rb'))
 bfper=pickle.load(open("bf_pred.sav",'rb'))
@@ -135,20 +139,59 @@ def main():
         if email:
             st.success(f'Email entered: {email}')
 
-        Age=st.number_input("Enter your age:", value=0, format="%d")
-        Weight=st.number_input("Enter your weight in pounds: ", format="%.1f")
-        Height=st.number_input("Enter your height in inches : ", format="%.1f")
-        Neck=st.number_input("Enter your neck in cm : ", format="%.1f")
-        Chest=st.number_input("Enter your chest in cm : ", format="%.1f")
-        Abdomen=st.number_input("Enter your abdomen in cm : ", format="%.1f")
-        Hip=st.number_input("Enter your hip in cm : ", format="%.1f")
-        Thigh=st.number_input("Enter your thigh in cm : ", format="%.1f")
-        Knee=st.number_input("Enter your knee in cm : ", format="%.1f")
-        Ankle=st.number_input("Enter your ankle in cm : ", format="%.1f")
-        Biceps=st.number_input("Enter your biceps in cm : ", format="%.1f")
-        Forearm=st.number_input("Enter your forearm in cm : ", format="%.1f")
-        Wrist=st.number_input("Enter your wrist in cm : ", format="%.1f")
+        Age = st.text_input("Enter your age:")
+        if Age:
+            Age = int(Age)
         
+        Weight = st.text_input("Enter your weight in pounds: ")
+        if Weight:
+            Weight = float(Weight)
+        
+        Height = st.text_input("Enter your height in inches : ")
+        if Height:
+            Height = float(Height)
+        
+        Neck = st.text_input("Enter your neck in cm : ")
+        if Neck:
+            Neck = float(Neck)
+        
+        Chest = st.text_input("Enter your chest in cm : ")
+        if Chest:
+            Chest = float(Chest)
+        
+        Abdomen = st.text_input("Enter your abdomen in cm : ")
+        if Abdomen:
+            Abdomen = float(Abdomen)
+        
+        Hip = st.text_input("Enter your hip in cm : ")
+        if Hip:
+            Hip = float(Hip)
+        
+        Thigh = st.text_input("Enter your thigh in cm : ")
+        if Thigh:
+            Thigh = float(Thigh)
+        
+        Knee = st.text_input("Enter your knee in cm : ")
+        if Knee:
+            Knee = float(Knee)
+        
+        Ankle = st.text_input("Enter your ankle in cm : ")
+        if Ankle:
+            Ankle = float(Ankle)
+        
+        Biceps = st.text_input("Enter your biceps in cm : ")
+        if Biceps:
+            Biceps = float(Biceps)
+        
+        Forearm = st.text_input("Enter your forearm in cm : ")
+        if Forearm:
+            Forearm = float(Forearm)
+        
+        Wrist = st.text_input("Enter your wrist in cm : ")
+        if Wrist:
+            Wrist = float(Wrist)
+        
+                
         if st.button('Calculate Body fat percentage'):
             bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist)
             st.write('Your Bodyfat percetage is :',round(bf2,2))
@@ -160,18 +203,43 @@ def main():
 
         #bmr2=bmr1
         
-    #if selected=="Best suitable diet for you":
-        #bmr2=bmr1
-        # create radio button to select fitness goal
-        #fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
-        # display selected fitness goal
-        #if fitness_goal == "Weight Loss":
-         #   wl=bmr2-300
-          #  st.write("You have selected weight loss and your bmr is ",round(bmr2,2),"You have eat upto ",wl)
-        #elif fitness_goal == "Weight Gain":
-         #  wg=bmr2-300
-          # st.write("You have selected weight gain and your bmr is ",round(bmr2,2),"You have eat atleast ",wg)
-        #else:
-         #   st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2))
+    if selected=="Best suitable diet for you":
+        conn = connect(credentials=credentials)
+        st.experimental_singleton
+        def run_query(id1):
+            sheet_url = st.secrets["private_gsheets_url"]
+            rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE id="{id1}"', headers=1)
+            rows = rows.fetchall()
+            return rows
+#AND email="{email}"
+# Get user input for ID and email.
+        id1 = st.text_input('Enter UID you recieved on your email :')
+        #email = st.text_input('Enter Email:')
+        fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
+
+# Run the SQL query and display the results.
+        if st.button('Your target'):
+            rows = run_query(id1)
+            if len(rows) == 0:
+                st.warning('No results found.')
+            else:
+                df = DataFrame(rows, columns=['id', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
+                bmr2=df.loc[0, 'bmr']
+                # create radio button to select fitness goal
+                
+                # display selected fitness goal
+                if fitness_goal == "Weight Loss":
+                    wl=bmr2-400
+                    st.write("You have selected weight loss and your bmr is ",round(bmr2,2),"You have eat upto ",round(wl))
+                elif fitness_goal == "Weight Gain":
+                    wg=bmr2+400
+                    st.write("You have selected weight gain and your bmr is ",round(bmr2,2),"You have eat atleast ",round(wg))
+                else:
+                    st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2))
+
+
+
+
+
 if __name__=='__main__': 
     main()
