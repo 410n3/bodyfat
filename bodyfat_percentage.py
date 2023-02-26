@@ -114,25 +114,6 @@ def main():
             'bf2': bf2,
             'bf1': bf1,
         }
-    
-    
-        
-
-    # Define the SQL query to insert the data
-        sql_query = "INSERT INTO user_input (id, email, Age, Weight, Height, bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        data = (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
-        
-
-    # Execute the query to insert the data
-        mycursor = conn.cursor()
-        mycursor.execute(sql_query, data)
-        
-
-    # Return a success message
-        return "Data inserted successfully!"
-    
-
-    mycursor=conn.cursor()
     def validate_email(email):
         # A simple regex to validate email format
         import re
