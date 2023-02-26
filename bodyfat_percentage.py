@@ -91,13 +91,13 @@ def main():
         options=["Predicting Bodyfat percent","Best suitable diet for you"],
         orientation="horizontal"
         )
-    @st.cache_resource
+    @st.experimental_singleton
     def init_connection():
         return mysql.connector.connect(**st.secrets["mysql"])
 
     conn = init_connection()
     # Perform query.
-    @st.cache_data(ttl=50)
+    @st.experimental_singleton
     def insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
     # Initialize the database connection
         conn = init_connection()
