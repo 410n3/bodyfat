@@ -97,7 +97,7 @@ def main():
 
     conn = init_connection()
     # Perform query.
-    @st.cache_data(ttl=600)
+    @st.cache_data(ttl=50)
     def insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
     # Initialize the database connection
         conn = init_connection()
