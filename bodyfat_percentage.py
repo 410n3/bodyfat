@@ -105,8 +105,8 @@ def main():
         conn = init_connection()
 
     # Define the SQL query to insert the data
-        sql_query = "INSERT INTO user_input (id, Age, Weight, Height, bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        data = (uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+        sql_query = "INSERT INTO user_input (id, email, Age, Weight, Height, bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        data = (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
 
     # Execute the query to insert the data
         mycursor = conn.cursor()
@@ -118,12 +118,30 @@ def main():
     
 
     mycursor=conn.cursor()
+    def validate_email(email):
+        # A simple regex to validate email format
+        import re
+        return re.match(r"[^@]+@[^@]+\.[^@]+", email)
 
     if selected=="Predicting Bodyfat percent":
-        uid=uuid.uuid4()
-        uid=uid.time
+        import random
+        import string
+
+        def generate_student_id():
+            alphanumeric = string.ascii_uppercase + string.digits
+            student_id = ''.join(random.choices(alphanumeric, k=5))
+            return student_id
+        uid=generate_student_id()
         st.header("Predicting your bodyfat percentage")
         gender = st.radio("Select your gender", ("Male", "Female"))
+        email = st.text_input('Enter your email')
+        if email and not validate_email(email):
+            st.warning('Please enter a valid email address')
+
+        # Display email to user
+        if email:
+            st.success(f'Email entered: {email}')
+
         Age=st.number_input("Enter your age:", value=0, format="%d")
         Weight=st.number_input("Enter your weight in pounds: ", format="%.1f")
         Height=st.number_input("Enter your height in inches : ", format="%.1f")
@@ -144,7 +162,7 @@ def main():
             st.write('Your BMI is :',round(bmi1,1))
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
-            insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+            insert_data(uid,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
             
 
         #bmr2=bmr1
