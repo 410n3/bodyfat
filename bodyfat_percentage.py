@@ -100,10 +100,10 @@ def main():
             "https://www.googleapis.com/auth/spreadsheets", ],)
     conn = connect(credentials=credentials)
     def insert_row(uid, age, weight, height, bmi1, bmr1, bf2, bf1):
-    conn.execute(
-        f'INSERT INTO "{sheet_url}" (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1),
-    )
+        conn.execute(
+            f'INSERT INTO "{sheet_url}" (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1),
+         )
     def validate_email(email):
         # A simple regex to validate email format
         import re
