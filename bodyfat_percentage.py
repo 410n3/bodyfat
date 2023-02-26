@@ -99,7 +99,7 @@ def main():
 
     conn = init_connection()
     # Perform query.
-    @st.experimental_singleton
+    @st.cache_data(ttl=100)
     def insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
     # Initialize the database connection
         conn = init_connection()
