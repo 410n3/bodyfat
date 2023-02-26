@@ -103,8 +103,8 @@ def main():
     def insert_data(uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
         sheet_url = st.secrets["private_gsheets_url"]
         conn.execute(
-        f'INSERT INTO "{sheet_url}" (uid, email, age, weight, height, bmi1, bmr1, bf2, bf1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        (uid, email, age, weight, height, bmi1, bmr1, bf2, bf1))
+        f'INSERT INTO "{sheet_url}" (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1))
     def validate_email(email):
         # A simple regex to validate email format
         import re
