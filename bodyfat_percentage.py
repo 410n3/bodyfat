@@ -97,6 +97,7 @@ def main():
     def init_connection():
         return mysql.connector.connect(**st.secrets["mysql"])
     # Perform query.
+    conn = init_connection()
     @st.cache_data(ttl=100)
     def insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
     
@@ -105,7 +106,7 @@ def main():
     # Define the SQL query to insert the data
         sql_query = "INSERT INTO user_input (id, email, Age, Weight, Height, bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         data = (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
-        conn = init_connection()
+        
 
     # Execute the query to insert the data
         mycursor = conn.cursor()
