@@ -113,7 +113,7 @@ def main():
             'bmr1': bmr1,
             'bf2': bf2,
             'bf1': bf1,
-        }
+        })
     def validate_email(email):
         # A simple regex to validate email format
         import re
