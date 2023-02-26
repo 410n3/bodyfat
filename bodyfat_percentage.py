@@ -214,8 +214,8 @@ def main():
 #AND email="{email}"
 # Get user input for ID and email.
         #id1 = st.text_input('Enter UID you recieved on your email :')
-        email1 = st.text_input('Enter Email:')
         fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
+        email1 = st.text_input('Enter Email:')
 
 # Run the SQL query and display the results.
         if st.button('Your target'):
