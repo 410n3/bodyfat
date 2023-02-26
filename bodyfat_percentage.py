@@ -92,28 +92,17 @@ def main():
         options=["Predicting Bodyfat percent","Best suitable diet for you"],
         orientation="horizontal"
         )
-    import time
 
-    @st.experimental_singleton
+    @st.cache_resource
     def init_connection():
-        if not hasattr(init_connection, 'last_refresh_time'):
-            init_connection.last_refresh_time = time.time()
+        return mysql.connector.connect(**st.secrets["mysql"])
 
-        if time.time() > init_connection.last_refresh_time + 5:
-            if hasattr(init_connection, 'conn'):
-                init_connection.conn.close()
-
-            init_connection.conn = mysql.connector.connect(**st.secrets["mysql"])
-            init_connection.last_refresh_time = time.time()
-
-        return init_connection.conn
-
-    conn1 = init_connection()
+    conn = init_connection()
     # Perform query.
     @st.experimental_singleton
     def insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
     # Initialize the database connection
-        conn1 = init_connection()
+        conn = init_connection()
 
     # Define the SQL query to insert the data
         sql_query = "INSERT INTO user_input (id, Age, Weight, Height, bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
@@ -122,13 +111,13 @@ def main():
     # Execute the query to insert the data
         mycursor = conn.cursor()
         mycursor.execute(sql_query, data)
-        conn1.commit()
+        conn.commit()
 
     # Return a success message
         return "Data inserted successfully!"
     
 
-    mycursor=conn1.cursor()
+    mycursor=conn.cursor()
 
     if selected=="Predicting Bodyfat percent":
         uid=uuid.uuid4()
