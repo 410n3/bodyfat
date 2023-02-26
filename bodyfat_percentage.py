@@ -86,7 +86,7 @@ def main():
     page_title="AI Bodyfat percentage calculator"
     page_icon=":chart_with_downwards_trend:"
     st.set_page_config(page_title=page_title,page_icon=page_icon)
-    st.markdown(""" <style> #MainMenu {visibility: hidden;}footer {visibility: hidden;}</style> """, unsafe_allow_html=True)
+    #st.markdown(""" <style> #MainMenu {visibility: hidden;}footer {visibility: hidden;}</style> """, unsafe_allow_html=True)
     st.title(page_icon + " " + page_title)
     selected=option_menu( 
         menu_title=None,
