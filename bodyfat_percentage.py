@@ -108,12 +108,12 @@ def main():
 
         return init_connection.conn
 
-    conn = init_connection()
+    conn1 = init_connection()
     # Perform query.
     @st.experimental_singleton
     def insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
     # Initialize the database connection
-        conn = init_connection()
+        conn1 = init_connection()
 
     # Define the SQL query to insert the data
         sql_query = "INSERT INTO user_input (id, Age, Weight, Height, bmi, bmr, bodyfat, bf_bmi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
@@ -122,16 +122,13 @@ def main():
     # Execute the query to insert the data
         mycursor = conn.cursor()
         mycursor.execute(sql_query, data)
-        conn.commit()
-
-    # Close the database connection
-        conn.close()
+        conn1.commit()
 
     # Return a success message
         return "Data inserted successfully!"
     
 
-    mycursor=conn.cursor()
+    mycursor=conn1.cursor()
 
     if selected=="Predicting Bodyfat percent":
         uid=uuid.uuid4()
