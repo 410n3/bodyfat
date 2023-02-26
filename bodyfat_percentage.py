@@ -100,12 +100,13 @@ def main():
             "https://www.googleapis.com/auth/spreadsheets", ],)
     conn = connect(credentials=credentials)
     @st.cache_data(ttl=100)
-    def insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
+    def insert_data(uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
         sheet_url = st.secrets["private_gsheets_url"]
         conn.insert(
             sheet_url,
         {
             'id': uid,
+            'email':email,
             'age': Age,
             'weight': Weight,
             'height': Height,
