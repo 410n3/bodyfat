@@ -139,6 +139,7 @@ def main():
         if email:
             st.success(f'Email entered: {email}')
 
+        email=email.lower()
         Age = st.text_input("Enter your age:")
         if Age:
             Age = int(Age)
@@ -216,6 +217,8 @@ def main():
         #id1 = st.text_input('Enter UID you recieved on your email :')
         fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
         email1 = st.text_input('Enter Email:')
+        email1=email1.lower()
+        
 
 # Run the SQL query and display the results.
         if st.button('Your target'):
