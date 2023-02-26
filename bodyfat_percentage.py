@@ -10,10 +10,11 @@ import streamlit as st
 import pickle
 import math
 from streamlit_option_menu import option_menu
-import uuid
 from sklearn.linear_model import LinearRegression
+import gspread
+import gspread_pandas as gspd
 from google.oauth2 import service_account
-from gsheetsdb import connect
+
 den=pickle.load(open("den_pred.sav",'rb'))
 bfper=pickle.load(open("bf_pred.sav",'rb'))
 
@@ -93,18 +94,23 @@ def main():
         orientation="horizontal"
         )
 
-    # Create a connection object.
+    ###
     credentials = service_account.Credentials.from_service_account_info(
         st.secrets["gcp_service_account"],
         scopes=[
-            "https://www.googleapis.com/auth/spreadsheets", ],)
-    conn = connect(credentials=credentials)
+            "https://www.googleapis.com/auth/spreadsheets",
+        ],
+    )
+    gc = gspread.authorize(credentials)
     sheet_url = st.secrets["private_gsheets_url"]
-    def insert_row(uid, email, age, weight, height, bmi1, bmr1, bf2, bf1):
-        conn.execute(
-            f'INSERT INTO "{sheet_url}" (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1),
-         )
+    sheet = gc.open_by_url(sheet_url).sheet1
+
+    # Insert a row into the Google Sheet.
+    def insert_row(uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
+        row = [uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1]
+        sheet.insert_row(row, 2)  # Insert the row at the second row (after the header).
+        st.success('Data inserted successfully.')
+        ###
     def validate_email(email):
         # A simple regex to validate email format
         import re
