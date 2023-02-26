@@ -12,8 +12,8 @@ import math
 from streamlit_option_menu import option_menu
 import uuid
 from sklearn.linear_model import LinearRegression
-import mysql.connector
-import time
+from google.oauth2 import service_account
+from gsheetsdb import connect
 den=pickle.load(open("den_pred.sav",'rb'))
 bfper=pickle.load(open("bf_pred.sav",'rb'))
 
@@ -93,13 +93,28 @@ def main():
         orientation="horizontal"
         )
 
-    @st.cache_resource
-    def init_connection():
-        return mysql.connector.connect(**st.secrets["mysql"])
-    # Perform query.
-    conn = init_connection()
+    # Create a connection object.
+    credentials = service_account.Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"],
+        scopes=[
+            "https://www.googleapis.com/auth/spreadsheets", ],)
+    conn = connect(credentials=credentials)
     @st.cache_data(ttl=100)
     def insert_data(uid, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
+        sheet_url = st.secrets["private_gsheets_url"]
+        conn.insert(
+            sheet_url,
+        {
+            'id': uid,
+            'age': Age,
+            'weight': Weight,
+            'height': Height,
+            'bmi1': bmi1,
+            'bmr1': bmr1,
+            'bf2': bf2,
+            'bf1': bf1,
+        }
+    
     
         
 
