@@ -206,20 +206,20 @@ def main():
     if selected=="Best suitable diet for you":
         conn = connect(credentials=credentials)
         st.experimental_singleton
-        def run_query(id1):
+        def run_query(email):
             sheet_url = st.secrets["private_gsheets_url"]
-            rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE id="{id1}"', headers=1)
+            rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email}"', headers=1)
             rows = rows.fetchall()
             return rows
 #AND email="{email}"
 # Get user input for ID and email.
-        id1 = st.text_input('Enter UID you recieved on your email :')
-        #email = st.text_input('Enter Email:')
+        #id1 = st.text_input('Enter UID you recieved on your email :')
+        email1 = st.text_input('Enter Email:')
         fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
 
 # Run the SQL query and display the results.
         if st.button('Your target'):
-            rows = run_query(id1)
+            rows = run_query(email1)
             if len(rows) == 0:
                 st.warning('No results found.')
             else:
