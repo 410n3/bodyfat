@@ -13,6 +13,7 @@ from streamlit_option_menu import option_menu
 import uuid
 from sklearn.linear_model import LinearRegression
 import mysql.connector
+import time
 den=pickle.load(open("den_pred.sav",'rb'))
 bfper=pickle.load(open("bf_pred.sav",'rb'))
 
@@ -91,9 +92,21 @@ def main():
         options=["Predicting Bodyfat percent","Best suitable diet for you"],
         orientation="horizontal"
         )
+    import time
+
     @st.experimental_singleton
     def init_connection():
-        return mysql.connector.connect(**st.secrets["mysql"])
+        if not hasattr(init_connection, 'last_refresh_time'):
+            init_connection.last_refresh_time = time.time()
+
+        if time.time() > init_connection.last_refresh_time + 5:
+            if hasattr(init_connection, 'conn'):
+                init_connection.conn.close()
+
+            init_connection.conn = mysql.connector.connect(**st.secrets["mysql"])
+            init_connection.last_refresh_time = time.time()
+
+        return init_connection.conn
 
     conn = init_connection()
     # Perform query.
