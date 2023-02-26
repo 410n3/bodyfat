@@ -148,7 +148,7 @@ def main():
             st.write('Your BMI is :',round(bmi1,1))
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
-            insert_data(uid,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+            insert_row(uid,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
             
 
         #bmr2=bmr1
