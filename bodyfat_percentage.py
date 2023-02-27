@@ -200,7 +200,8 @@ def main():
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
             insert_row(uid,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
-            
+        if st.button('Get this app on your website'):
+            st.markdown(f'<iframe src="{st.get_url_path()}" width="600" height="400"></iframe>', unsafe_allow_html=True)  
 
         #bmr2=bmr1
         
