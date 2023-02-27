@@ -17,4 +17,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://nerdsformula:$HF_TOKEN@huggingface.co/spaces/nerdsformula/dietncity main
+        run: git push --force https://nerdsformula:$HF_TOKEN@huggingface.co/spaces/nerdsformula/AI-Bodyfat-Analyzer main
