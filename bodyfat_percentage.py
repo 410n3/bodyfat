@@ -126,7 +126,7 @@ def main():
 
         def generate_student_id():
             alphanumeric = string.ascii_uppercase + string.digits
-            student_id = ''.join(random.choices(alphanumeric, k=5))
+            student_id = ''.join(random.choices(alphanumeric, k=8))
             return student_id
         uid=generate_student_id()
         st.header("Predicting your bodyfat percentage")
@@ -200,13 +200,6 @@ def main():
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
             insert_row(uid,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
-
-        # Add a Streamlit button that generates the iframe embed code
-        if st.button('Get iframe embed code'):
-            url = st.get_share_streamlit_url()
-            iframe = f'<iframe src="{url}" width="600" height="400"></iframe>'
-            st.write(iframe, unsafe_allow_html=True)
-        #bmr2=bmr1
         
     if selected=="Best suitable diet for you":
         conn = connect(credentials=credentials)
@@ -218,10 +211,11 @@ def main():
             return rows
 #AND email="{email}"
 # Get user input for ID and email.
-        #id1 = st.text_input('Enter UID you recieved on your email :')
+        id1 = st.text_input('Enter UID you recieved on your email :')
         fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
         email1 = st.text_input('Enter Email:')
         email1=email1.lower()
+        id1=id1.upper()
         
 
 # Run the SQL query and display the results.
