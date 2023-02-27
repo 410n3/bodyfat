@@ -233,9 +233,6 @@ def main():
                     wl=bmr2-400
                     st.write("You have selected weight loss and your bmr is ",round(bmr2,2),"You have eat upto ",round(wl))
                     import pandas as pd
-                    import numpy as np
-                    import seaborn as sns
-                    import matplotlib.pyplot as plt
 
                     # Set initial variables
                     starting_weight = df.loc[0, 'Weight']
