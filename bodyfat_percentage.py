@@ -113,7 +113,7 @@ def main():
     def insert_row(uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
         row = [uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1]
         sheet.insert_row(row, 2)  # Insert the row at the second row (after the header).
-        st.success('Data inserted successfully.')
+        st.success('Stored for futher calculations.')
         ###
     def validate_email(email):
         # A simple regex to validate email format
