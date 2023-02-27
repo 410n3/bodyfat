@@ -200,9 +200,12 @@ def main():
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
             insert_row(uid,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
-        if st.button('Get this app on your website'):
-            st.markdown(f'<iframe src="{st.get_url_path()}" width="600" height="400"></iframe>', unsafe_allow_html=True)  
 
+        # Add a Streamlit button that generates the iframe embed code
+        if st.button('Get iframe embed code'):
+            url = st.get_share_streamlit_url()
+            iframe = f'<iframe src="{url}" width="600" height="400"></iframe>'
+            st.write(iframe, unsafe_allow_html=True)
         #bmr2=bmr1
         
     if selected=="Best suitable diet for you":
