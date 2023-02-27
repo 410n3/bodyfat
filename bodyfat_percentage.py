@@ -206,7 +206,7 @@ def main():
         st.experimental_singleton
         def run_query(email1,id1):
             sheet_url = st.secrets["private_gsheets_url"]
-            rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"AND id={id1}', headers=1)
+            rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"AND id="{id1}"', headers=1)
             rows = rows.fetchall()
             return rows
 #AND email="{email}"
