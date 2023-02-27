@@ -232,82 +232,75 @@ def main():
                 if fitness_goal == "Weight Loss":
                     wl=bmr2-400
                     st.write("You have selected weight loss and your bmr is ",round(bmr2,2),"You have eat upto ",round(wl))
+                    import pandas as pd
+                    import numpy as np
+                    import seaborn as sns
+                    import matplotlib.pyplot as plt
+
+                    # Set initial variables
+                    starting_weight = df.loc[0, 'Weight']
+                    starting_weight=starting_weight/2.205# pounds
+                    # calories/day
+                    daily_calories = wl  # calories/day
+                    workout = st.radio("Whats your workout routine ", ("30 mins", "45 mins", "60 mins"))
+                    if workout == "30 mins":
+                        exercise = st.radio("Whats your exercise  ", ("Burpees", "Skipping", "Indoor cycling"))
+                        if exercise == "Burpees":
+                            met=8
+                        elif exercise == "Skipping":
+                            met=10
+                        else:
+                            met=7.5
+                        time_hours = 30 / 60    
+                        exercise_calories = met * starting_weight * time_hours
+                    elif workout == "45 mins":
+                        exercise = st.radio("Whats your exercise  ", ("Burpees", "Skipping", "Indoor cycling"))
+                        if exercise == "Burpees":
+                            met=8
+                        elif exercise == "Skipping":
+                            met=10
+                        else:
+                            met=7.5
+                        time_hours = 45 / 60    
+                        exercise_calories = met * starting_weight * time_hours
+                    else: 
+                        exercise = st.radio("Whats your exercise  ", ("Burpees", "Skipping", "Indoor cycling"))
+                        if exercise == "Burpees":
+                            met=8
+                        elif exercise == "Skipping":
+                            met=10
+                        else:
+                            met=7.5
+                        time_hours = 60 / 60    
+                        exercise_calories = met * starting_weight * time_hours
+                    # calories/day
+                    daily_steps = 10000
+                    days = 21
+
+                    # Calculate daily calorie expenditure
+                    def calculate_daily_calories(bmr2, daily_calories, exercise_calories, daily_steps):
+                        return bmr2 + (exercise_calories * 7) + (daily_steps * 0.05)
+
+                    daily_calorie_expenditure = calculate_daily_calories(bmr2, daily_calories, exercise_calories, daily_steps)
+
+                    # Calculate daily calorie deficit
+                    daily_calorie_deficit = daily_calorie_expenditure - daily_calories
+
+                    # Calculate daily weight loss
+                    daily_weight_loss = daily_calorie_deficit / 3500  # 1 pound of fat is approximately 3500 calories
+
+                    # Create a dataframe to store the daily weight and day number
+                    weight_data = {'Day': range(1, days+1)}
+                    weight_df = pd.DataFrame(weight_data)
+
+                    # Calculate the estimated weight for each day
+                    weight_df['Weight'] = starting_weight - (daily_weight_loss * weight_df['Day'])
+
+                    # Plot the estimated weight loss over time using Seaborn
+                    # Calculate final weight
+                    final_weight = weight_df.iloc[-1]['Weight']
                     if st.button('Your future'):
-                        import pandas as pd
-                        import numpy as np
-                        import seaborn as sns
-                        import matplotlib.pyplot as plt
-                        
-                        # Set initial variables
-                        starting_weight = df.loc[0, 'Weight']
-                        starting_weight=starting_weight/2.205# pounds
-                          # calories/day
-                        daily_calories = wl  # calories/day
-                        workout = st.radio("Whats your workout routine ", ("30 mins", "45 mins", "60 mins"))
-                        if workout == "30 mins":
-                            exercise = st.radio("Whats your exercise  ", ("Burpees", "Skipping", "Indoor cycling"))
-                            if exercise == "Burpees":
-                                met=8
-                            elif exercise == "Skipping":
-                                met=10
-                            else:
-                                met=7.5
-                            time_hours = 30 / 60    
-                            exercise_calories = met * starting_weight * time_hours
-                        elif workout == "45 mins":
-                            exercise = st.radio("Whats your exercise  ", ("Burpees", "Skipping", "Indoor cycling"))
-                            if exercise == "Burpees":
-                                met=8
-                            elif exercise == "Skipping":
-                                met=10
-                            else:
-                                met=7.5
-                            time_hours = 45 / 60    
-                            exercise_calories = met * starting_weight * time_hours
-                        else: 
-                            exercise = st.radio("Whats your exercise  ", ("Burpees", "Skipping", "Indoor cycling"))
-                            if exercise == "Burpees":
-                                met=8
-                            elif exercise == "Skipping":
-                                met=10
-                            else:
-                                met=7.5
-                            time_hours = 60 / 60    
-                            exercise_calories = met * starting_weight * time_hours
-                          # calories/day
-                        daily_steps = 10000
-                        days = 21
-                        
-                        # Calculate daily calorie expenditure
-                        def calculate_daily_calories(bmr2, daily_calories, exercise_calories, daily_steps):
-                            return bmr2 + (exercise_calories * 7) + (daily_steps * 0.05)
-                        
-                        daily_calorie_expenditure = calculate_daily_calories(bmr2, daily_calories, exercise_calories, daily_steps)
-                        
-                        # Calculate daily calorie deficit
-                        daily_calorie_deficit = daily_calorie_expenditure - daily_calories
-                        
-                        # Calculate daily weight loss
-                        daily_weight_loss = daily_calorie_deficit / 3500  # 1 pound of fat is approximately 3500 calories
-                        
-                        # Create a dataframe to store the daily weight and day number
-                        weight_data = {'Day': range(1, days+1)}
-                        weight_df = pd.DataFrame(weight_data)
-                        
-                        # Calculate the estimated weight for each day
-                        weight_df['Weight'] = starting_weight - (daily_weight_loss * weight_df['Day'])
-                        
-                        # Plot the estimated weight loss over time using Seaborn
-                        sns.set_style('darkgrid')
-                        sns.lineplot(data=weight_df, x='Day', y='Weight')
-                        plt.xlabel('Day')
-                        plt.ylabel('Weight (lbs)')
-                        plt.title('Estimated Weight Loss over 21 Days')
-                        plt.show()
-                        
-                        # Calculate final weight
-                        final_weight = weight_df.iloc[-1]['Weight']
-                        print(f'Your final weight after 21 days would be {final_weight:.1f} pounds.')
+                        print(f'Your final weight after 21 days would be {final_weight:.1f} pounds.')                    
                 elif fitness_goal == "Weight Gain":
                     wg=bmr2+400
                     st.write("You have selected weight gain and your bmr is ",round(bmr2,2),"You have eat atleast ",round(wg))
