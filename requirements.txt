@@ -2,7 +2,7 @@ pyparsing
 gspread_pandas
 gspread
 gsheetsdb
-numpy==1.21.5
-scikit_learn==1.2.1
-streamlit==1.18.1
-streamlit_option_menu==0.3.2
+numpy
+scikit_learn
+streamlit
+streamlit_option_menu
