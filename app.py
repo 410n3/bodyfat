@@ -16,13 +16,18 @@ import gspread_pandas as gspd
 from google.oauth2 import service_account
 from pandas import DataFrame
 from gsheetsdb import connect
+import pandas as pd
+import random
+import string
+
+
 
 
 
 den=pickle.load(open("den_pred.sav",'rb'))
 bfper=pickle.load(open("bf_pred.sav",'rb'))
 
-def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist):
+def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip):
     # Calculating body fat percentage for males
     height=float(Height)
     height=height*2.54
@@ -39,9 +44,9 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Bic
         bmr=(9.247*weight) + (3.098*height) - (4.330*Age) + 447.593
     else:
         return "Invalid input. Please enter M or F for gender."
-    user_update=[[body_fat_perc,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist]]
+    user_update=[[body_fat_perc,Age,Weight,Height,Neck,Chest,Abdomen,Hip]]
     prediction=den.predict(user_update)
-    user_update2=[[prediction[0],Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist]]
+    user_update2=[[prediction[0],Age,Weight,Height,Neck,Chest,Abdomen,Hip]]
     prediction2=bfper.predict(user_update2)
     weight=float(Weight)
     height=float(Height)
@@ -94,7 +99,7 @@ def main():
     st.title(page_icon + " " + page_title)
     selected=option_menu( 
         menu_title=None,
-        options=["Predicting Bodyfat percent","Best suitable diet for you"],
+        options=["Predicting Bodyfat percent","Your target Calories intake","21 days weight loss guide"],
         orientation="horizontal"
         )
 
@@ -115,20 +120,24 @@ def main():
         sheet.insert_row(row, 2)  # Insert the row at the second row (after the header).
         st.success('Stored for futher calculations.')
         ###
+    def run_query(email1,id1):
+       sheet_url = st.secrets["private_gsheets_url"]
+       rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"AND id="{id1}"', headers=1)
+       rows = rows.fetchall()
+       return rows
     def validate_email(email):
         # A simple regex to validate email format
         import re
         return re.match(r"[^@]+@[^@]+\.[^@]+", email)
 
     if selected=="Predicting Bodyfat percent":
-        import random
-        import string
 
-        def generate_student_id():
+
+        def generate_id(length=8):
             alphanumeric = string.ascii_uppercase + string.digits
-            student_id = ''.join(random.choices(alphanumeric, k=8))
-            return student_id
-        uid=generate_student_id()
+            id = ''.join(random.choice(alphanumeric) for _ in range(length))
+            return id
+        uid=generate_id()
         st.header("Predicting your bodyfat percentage")
         gender = st.radio("Select your gender", ("Male", "Female"))
         email = st.text_input('Enter your email')
@@ -168,50 +177,24 @@ def main():
         if Hip:
             Hip = float(Hip)
         
-        Thigh = st.text_input("Enter your thigh in cm : ")
-        if Thigh:
-            Thigh = float(Thigh)
-        
-        Knee = st.text_input("Enter your knee in cm : ")
-        if Knee:
-            Knee = float(Knee)
-        
-        Ankle = st.text_input("Enter your ankle in cm : ")
-        if Ankle:
-            Ankle = float(Ankle)
-        
-        Biceps = st.text_input("Enter your biceps in cm : ")
-        if Biceps:
-            Biceps = float(Biceps)
-        
-        Forearm = st.text_input("Enter your forearm in cm : ")
-        if Forearm:
-            Forearm = float(Forearm)
-        
-        Wrist = st.text_input("Enter your wrist in cm : ")
-        if Wrist:
-            Wrist = float(Wrist)
         
                 
         if st.button('Calculate Body fat percentage'):
-            bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip,Thigh,Knee,Ankle,Biceps,Forearm,Wrist)
+            bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip)
+            st.write('Your Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
             st.write('Your Bodyfat percetage is :',round(bf2,2))
             st.write('Your BMI is :',round(bmi1,1))
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
             insert_row(uid,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
         
-    if selected=="Best suitable diet for you":
+    if selected=="Your target Calories intake":
         conn = connect(credentials=credentials)
         st.experimental_singleton
-        def run_query(email1,id1):
-            sheet_url = st.secrets["private_gsheets_url"]
-            rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"AND id="{id1}"', headers=1)
-            rows = rows.fetchall()
-            return rows
+        
 #AND email="{email}"
 # Get user input for ID and email.
-        id1 = st.text_input('Enter UID you recieved on your email :')
+        id1 = st.text_input('Enter your Unique ID :')
         fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
         email1 = st.text_input('Enter Email:')
         email1=email1.lower()
@@ -238,9 +221,100 @@ def main():
                 else:
                     st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2))
 
+    if selected=="21 days weight loss guide":
+        conn = connect(credentials=credentials)
+        st.experimental_singleton
+        id1 = st.text_input('Enter your Unique ID :')
+        plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
+        exercise = st.radio("Whats your type of workout you plan to do  ", ("High intensity workout", "Low intensity workout", "Moderate intensity workout"))
+        email1 = st.text_input('Enter Email:')
+        email1=email1.lower()
+        id1=id1.upper()
+        rows = run_query(email1,id1)
+        
+        if st.button('Your future'):
+            
+            
+            
+            if len(rows) == 0:
+                st.warning('No results found.')
+            else:
+                df = DataFrame(rows, columns=['id', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
+                bmr3=df.loc[0, 'bmr']
+                starting_weight = df.loc[0, 'Weight']
+                starting_weight=starting_weight/2.205# pounds
+            if plans == "30 mins":
+                if exercise == "High intensity workout":
+                    met=8.5
+                elif exercise == "Low intensity workout":
+                    met=3
+                else:
+                    met=4.5
+                time_hours = 30 / 60  
+                wl=bmr3-400
+                daily_calories = wl
+                    # calories/day
+                exercise_calories = met * starting_weight * time_hours
+            elif plans == "45 mins":
+                if exercise == "High intensity workout":
+                    met=8.5
+                elif exercise == "Low intensity workout":
+                    met=3
+                else:
+                    met=4.5
+                time_hours = 45 / 60    
+                exercise_calories = met * starting_weight * time_hours
+                wl=bmr3-400
+                daily_calories = wl
+            else: 
+                if exercise == "High intensity workout":
+                    met=8.5
+                elif exercise == "Low intensity workout":
+                    met=3
+                else:
+                    met=4.5
+                time_hours = 60 / 60    
+                exercise_calories = met * starting_weight * time_hours
+                wl=bmr3-400
+                daily_calories = wl
+            daily_steps = 10000
+            days = 21
+            # Calculate daily calorie expenditure
+            def calculate_daily_calories(bmr3, daily_calories, exercise_calories, daily_steps):
+                return bmr3 + (exercise_calories) + (daily_steps * 0.05)
+            daily_calorie_expenditure = calculate_daily_calories(bmr3, daily_calories, exercise_calories, daily_steps)
 
+            # Calculate daily calorie deficit
+            daily_calorie_deficit = daily_calorie_expenditure - daily_calories
+                                    
+            # Calculate daily weight loss
+            daily_weight_loss = daily_calorie_deficit / 3500  # 1 pound of fat is approximately 3500 calories
 
+            # Create a dataframe to store the daily weight and day number
+            weight_data = {'Day': range(1, days+1)}
+            weight_df = pd.DataFrame(weight_data)
 
+            # Calculate the estimated weight for each day
+            weight_df['Weight'] = starting_weight - (daily_weight_loss * weight_df['Day'])
+            
+
+            # Plot the estimated weight loss over time using Seaborn
+            
+
+            # Calculate final weight
+            final_weight = weight_df.iloc[-1]['Weight']
+            st.write("Your present weight is ",round(starting_weight,2),"  and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kg")
+            st.write("***REPORT***")
+            st.write("For results like this you have to walk altleats ",daily_steps," and do ",exercise,"for ",plans)
+            st.write("This will lead you to burn ",(daily_steps * 0.05)," calories"," from ",daily_steps," steps and by ",exercise,"for ",plans," you will burn ",round(exercise_calories,2)," calories")
+            st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",daily_calorie_deficit )
+            st.write("If you wanna lose ",round(round(starting_weight,2)-round(final_weight,2),2),"Read our Weight loss ebook which is completely free for now")
+            st.write("1:- ***In this ebook you will learn what Kind of workouts shoul do in***",exercise)
+            st.write("2:- ***Plus you will also get insights what should be your diet according to your calories i.e.*** ",round(wl,0))
+            link = "<a href='https://www.dietncity.com' target='_blank'>FREE EBOOK</a>"
+            st.write("Click the link below")
+            st.markdown(link, unsafe_allow_html=True)
+            
 
 if __name__=='__main__': 
     main()
