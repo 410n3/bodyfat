@@ -115,8 +115,8 @@ def main():
     sheet = gc.open_by_url(sheet_url).sheet1
 
     # Insert a row into the Google Sheet.
-    def insert_row(uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
-        row = [uid, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1]
+    def insert_row(uid ,name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
+        row = [uid, name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1]
         sheet.insert_row(row, 2)  # Insert the row at the second row (after the header).
         st.success('Stored for futher calculations.')
         ###
@@ -140,6 +140,7 @@ def main():
         uid=generate_id()
         st.header("Predicting your bodyfat percentage")
         gender = st.radio("Select your gender", ("Male", "Female"))
+        name=st.text_input('Enter your First Name')
         email = st.text_input('Enter your email')
         if email and not validate_email(email):
             st.warning('Please enter a valid email address')
@@ -181,7 +182,7 @@ def main():
                 
         if st.button('Calculate Body fat percentage'):
             bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip)
-            st.write('Your Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
+            st.write('Hey!',name,' Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
             st.write('Your Bodyfat percetage is :',round(bf2,2))
             st.write('Your BMI is :',round(bmi1,1))
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
@@ -207,7 +208,7 @@ def main():
             if len(rows) == 0:
                 st.warning('No results found.')
             else:
-                df = DataFrame(rows, columns=['id', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
+                df = DataFrame(rows, columns=['id','name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
                 bmr2=df.loc[0, 'bmr']
                 # create radio button to select fitness goal
                 
@@ -239,8 +240,9 @@ def main():
             if len(rows) == 0:
                 st.warning('No results found.')
             else:
-                df = DataFrame(rows, columns=['id', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
+                df = DataFrame(rows, columns=['id','name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
                 bmr3=df.loc[0, 'bmr']
+                name1=df.loc[0, 'name']
                 starting_weight = df.loc[0, 'Weight']
                 starting_weight=starting_weight/2.205# pounds
             if plans == "30 mins":
@@ -303,12 +305,12 @@ def main():
 
             # Calculate final weight
             final_weight = weight_df.iloc[-1]['Weight']
-            st.write("Your present weight is ",round(starting_weight,2),"  and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kg")
+            st.write(name1," present weight is ",round(starting_weight,2)," kg and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kg")
             st.write("***REPORT***")
-            st.write("For results like this you have to walk altleats ",daily_steps," and do ",exercise,"for ",plans)
+            st.write("For results like this",name1," you have to walk altleats ",daily_steps," steps and do ",exercise,"for ",plans," in daily basis")
             st.write("This will lead you to burn ",(daily_steps * 0.05)," calories"," from ",daily_steps," steps and by ",exercise,"for ",plans," you will burn ",round(exercise_calories,2)," calories")
             st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",round(daily_calorie_deficit,2))
-            st.write("If you wanna lose ",round(round(starting_weight,2)-round(final_weight,2),2),"Read our Weight loss ebook which is completely free for now")
+            st.write("If you wanna lose ",round(round(starting_weight,2)-round(final_weight,2),2),"kgs Read our Weight loss ebook which is completely free for now")
             st.write("1:- ***In this ebook you will learn what Kind of workouts shoul do in***",exercise)
             st.write("2:- ***Plus you will also get insights what should be your diet according to your calories i.e.*** ",round(wl,0))
             link = "<a href='https://www.dietncity.com' target='_blank'>FREE EBOOK</a>"
