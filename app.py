@@ -122,7 +122,7 @@ def main():
         ###
     def run_query(email1,id1):
        sheet_url = st.secrets["private_gsheets_url"]
-       rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"AND id="{id1}"', headers=1)
+       rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}" AND id="{id1}"', headers=1)
        rows = rows.fetchall()
        return rows
     def validate_email(email):
@@ -182,7 +182,7 @@ def main():
                 
         if st.button('Calculate Body fat percentage'):
             bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip)
-            st.write('Hey!',name,' Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
+            st.write('Hey!',name,'your Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
             st.write('Your Bodyfat percetage is :',round(bf2,2))
             st.write('Your BMI is :',round(bmi1,1))
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
