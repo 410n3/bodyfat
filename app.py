@@ -115,32 +115,28 @@ def main():
     sheet = gc.open_by_url(sheet_url).sheet1
 
     # Insert a row into the Google Sheet.
-    def insert_row(uid , name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
+    def insert_row(uid, name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
         row = [uid, name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1]
         sheet.insert_row(row, 2)  # Insert the row at the second row (after the header).
         st.success('Stored for futher calculations.')
         ###
-    def run_query(email1,id1):
-       sheet_url = st.secrets["private_gsheets_url"]
-       rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}" AND id="{id1}"', headers=1)
-       rows = rows.fetchall()
-       return rows
     def validate_email(email):
         # A simple regex to validate email format
         import re
         return re.match(r"[^@]+@[^@]+\.[^@]+", email)
-
-    if selected=="Predicting Bodyfat percent":
-
-
-        def generate_id(length=8):
+    def generate_id(length=8):
             alphanumeric = string.ascii_uppercase + string.digits
             id = ''.join(random.choice(alphanumeric) for _ in range(length))
             return id
-        uid=generate_id()
+
+
+    if selected=="Predicting Bodyfat percent":
         st.header("Predicting your bodyfat percentage")
         gender = st.radio("Select your gender", ("Male", "Female"))
-        name=st.text_input('Enter your First Name')
+        name = st.text_input('Enter your name')
+        uid=""
+        uid=generate_id()
+        uid=uid.upper()
         email = st.text_input('Enter your email')
         if email and not validate_email(email):
             st.warning('Please enter a valid email address')
@@ -182,67 +178,94 @@ def main():
                 
         if st.button('Calculate Body fat percentage'):
             bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip)
-            st.write('Hey!',name,'your Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
+            st.write('Your Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
             st.write('Your Bodyfat percetage is :',round(bf2,2))
             st.write('Your BMI is :',round(bmi1,1))
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
-            insert_row(uid,name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+            insert_row(uid, name,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
         
     if selected=="Your target Calories intake":
         conn = connect(credentials=credentials)
-        st.experimental_singleton
+        
         
 #AND email="{email}"
 # Get user input for ID and email.
-        id1 = st.text_input('Enter your Unique ID :')
-        fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
         email1 = st.text_input('Enter Email:')
+        fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
+        
+        id1=st.text_input("Enter your UID number :")
+        if email1 and not validate_email(email1):
+            st.warning('Please enter a valid email address')
+
+        # Display email to user
+        if email1:
+            st.success(f'Email entered: {email1}')
         email1=email1.lower()
-        id1=id1.upper()
+        
         
 
 # Run the SQL query and display the results.
         if st.button('Your target'):
-            rows = run_query(email1,id1)
-            if len(rows) == 0:
-                st.warning('No results found.')
-            else:
-                df = DataFrame(rows, columns=['id','name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
-                bmr2=df.loc[0, 'bmr']
-                # create radio button to select fitness goal
-                
-                # display selected fitness goal
-                if fitness_goal == "Weight Loss":
-                    wl=bmr2-400
-                    st.write("You have selected weight loss and your bmr is ",round(bmr2,2),"You have eat upto ",round(wl))
-                elif fitness_goal == "Weight Gain":
-                    wg=bmr2+400
-                    st.write("You have selected weight gain and your bmr is ",round(bmr2,2),"You have eat atleast ",round(wg))
+                st.experimental_singleton
+                def run_query(email1):
+                   sheet_url = st.secrets["private_gsheets_url"]
+                   rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"', headers=1)
+                   rows = rows.fetchall()
+                   return rows
+                rows = run_query(email1)
+                if len(rows) == 0:
+                    st.warning('No results found. please check your body fat percentage first ')
                 else:
-                    st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2))
+                    df = DataFrame(rows, columns=['uid', 'name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
+                    bmr2=df.loc[0, 'bmr']
+                    name1=df.loc[0, 'name']
+                    # create radio button to select fitness goal
+                    
+                    uid1=df.loc[0, 'uid']
+                    if uid1==id1:# display selected fitness goal
+                        if fitness_goal == "Weight Loss":
+                            wl=bmr2-400
+                            st.write("HEY! ",name1)
+                            st.write("You have selected weight loss and your bmr is ",round(bmr2,2),"You have eat upto ",round(wl),"calories")
+                        elif fitness_goal == "Weight Gain":
+                            wg=bmr2+400
+                            st.write("HEY! ",name1)
+                            st.write("You have selected weight gain and your bmr is ",round(bmr2,2),"You have eat atleast ",round(wg),"calories")
+                        else:
+                            st.write("HEY! ",name1)
+                            st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2),"calories")
+                    else:
+                        st.error("What kind of fitness enthusiast you are that you cant remember your UID then how you gonna remember how much calories you ate")
+
 
     if selected=="21 days weight loss guide":
         conn = connect(credentials=credentials)
         st.experimental_singleton
-        id1 = st.text_input('Enter your Unique ID :')
         plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
         exercise = st.radio("Whats your type of workout you plan to do  ", ("High intensity workout", "Low intensity workout", "Moderate intensity workout"))
+        id1=st.text_input("Enter your UID number :")
         email1 = st.text_input('Enter Email:')
         email1=email1.lower()
-        id1=id1.upper()
-        rows = run_query(email1,id1)
+        
+       
+        def run_query(query):
+            rows = conn.execute(query, headers=1)
+            rows = rows.fetchall()
+            return rows
+        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"')
         
         if st.button('Your future'):
             
             
             
             if len(rows) == 0:
-                st.warning('No results found.')
+                st.warning('No results found. please check your body fat percentage first ')
             else:
-                df = DataFrame(rows, columns=['id','name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
+                df = DataFrame(rows, columns=['uid', 'name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
                 bmr3=df.loc[0, 'bmr']
                 name1=df.loc[0, 'name']
+
                 starting_weight = df.loc[0, 'Weight']
                 starting_weight=starting_weight/2.205# pounds
             if plans == "30 mins":
@@ -305,17 +328,21 @@ def main():
 
             # Calculate final weight
             final_weight = weight_df.iloc[-1]['Weight']
-            st.write(name1," present weight is ",round(starting_weight,2)," kg and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kg")
-            st.write("***REPORT***")
-            st.write("For results like this",name1," you have to walk altleats ",daily_steps," steps and do ",exercise,"for ",plans," in daily basis")
-            st.write("This will lead you to burn ",(daily_steps * 0.05)," calories"," from ",daily_steps," steps and by ",exercise,"for ",plans," you will burn ",round(exercise_calories,2)," calories")
-            st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",round(daily_calorie_deficit,2))
-            st.write("If you wanna lose ",round(round(starting_weight,2)-round(final_weight,2),2),"kgs Read our Weight loss ebook which is completely free for now")
-            st.write("1:- ***In this ebook you will learn what Kind of workouts shoul do in***",exercise)
-            st.write("2:- ***Plus you will also get insights what should be your diet according to your calories i.e.*** ",round(wl,0))
-            link = "<a href='https://www.dietncity.com' target='_blank'>FREE EBOOK</a>"
-            st.write("Click the link below")
-            st.markdown(link, unsafe_allow_html=True)
+            uid1=df.loc[0, 'uid']
+            if uid1==id1:
+                st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
+                st.write("***REPORT***")
+                st.write("For results like this you have to walk altleats ",daily_steps," steps daily and do ",exercise,"for ",plans," daily")
+                st.write("This will lead you to burn ",(daily_steps * 0.05)," calories"," from ",daily_steps," steps and by ",exercise,"for ",plans," you will burn ",round(exercise_calories,2)," calories")
+                st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",daily_calorie_deficit )
+                st.write("If you wanna lose ",round(round(starting_weight,2)-round(final_weight,2),2)," kgs Read our Weight loss ebook which is completely free for now")
+                st.write("1:- ***In this ebook you will learn what Kind of workouts shoul do in***",exercise)
+                st.write("2:- ***Plus you will also get insights what should be your diet according to your calories i.e.*** ",round(wl,0))
+                link = "<a href='https://www.dietncity.com' target='_blank'>FREE EBOOK</a>"
+                st.write("Click the link below")
+                st.markdown(link, unsafe_allow_html=True)
+            else:
+                st.error("INVALID UID-This is frustating now it was just 8 digit number how can you cant remember 8 digit number do you know your contact number ?")
             
 
 if __name__=='__main__': 
