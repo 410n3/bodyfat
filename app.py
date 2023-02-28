@@ -307,7 +307,7 @@ def main():
             st.write("***REPORT***")
             st.write("For results like this you have to walk altleats ",daily_steps," and do ",exercise,"for ",plans)
             st.write("This will lead you to burn ",(daily_steps * 0.05)," calories"," from ",daily_steps," steps and by ",exercise,"for ",plans," you will burn ",round(exercise_calories,2)," calories")
-            st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",daily_calorie_deficit )
+            st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",round(daily_calorie_deficit,2))
             st.write("If you wanna lose ",round(round(starting_weight,2)-round(final_weight,2),2),"Read our Weight loss ebook which is completely free for now")
             st.write("1:- ***In this ebook you will learn what Kind of workouts shoul do in***",exercise)
             st.write("2:- ***Plus you will also get insights what should be your diet according to your calories i.e.*** ",round(wl,0))
