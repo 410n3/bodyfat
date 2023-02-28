@@ -115,7 +115,7 @@ def main():
     sheet = gc.open_by_url(sheet_url).sheet1
 
     # Insert a row into the Google Sheet.
-    def insert_row(uid ,name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
+    def insert_row(uid , name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
         row = [uid, name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1]
         sheet.insert_row(row, 2)  # Insert the row at the second row (after the header).
         st.success('Stored for futher calculations.')
@@ -187,7 +187,7 @@ def main():
             st.write('Your BMI is :',round(bmi1,1))
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
-            insert_row(uid,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+            insert_row(uid,name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
         
     if selected=="Your target Calories intake":
         conn = connect(credentials=credentials)
