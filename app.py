@@ -100,8 +100,8 @@ def main():
     selected=option_menu( 
         menu_title=None,
         options=["Predicting Bodyfat percent","Your target Calories intake","21 days weight loss guide"],
-        orientation="horizontal"
-        icons=["cpu-fill","activity","calendar-check"]
+        icons=["cpu-fill","activity","calendar-check"],
+        orientation="horizontal",
         )
 
     ###
