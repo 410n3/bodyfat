@@ -37,7 +37,7 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip):
     bmr=0
     if gender == "Male":
         body_fat_perc= 495 / (1.0324 - 0.19077 * (math.log10(Abdomen - Neck)) + 0.15456 * (math.log10(height))) - 450
-        bmr = (3.397*weight)+ (4.799*height) - (5.677*Age) + 88.362
+        bmr = (13.397*weight)+ (4.799*height) - (5.677*Age) + 88.362
 # Calculating body fat percentage for females
     elif gender == "Female":
         body_fat_perc = 495 / (1.29579 - 0.35004 * (math.log10(Abdomen + Hip - Neck)) + 0.22100 * (math.log10(height))) - 450
@@ -66,29 +66,54 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip):
             bf1=round(prediction2[0] + conclusion,3)
             return bf1,bmi,bf,bmr
     elif bmi <= 24.9:
-        bf1=round(prediction2[0],3)
-        return bf1,bmi,bf,bmr
+        if bf > prediction2[0]:  
+            conclusion = bf - prediction2[0]
+            conclusion = round(conclusion, 0)
+            if conclusion>=7:
+                conclusion=conclusion-6
+                bf1=round(prediction2[0]-conclusion,3)
+            else:
+                conclusion=conclusion-2.5
+                bf1=round(prediction2[0] + conclusion,3)
+            return bf1,bmi,bf,bmr
+        else:
+            conclusion = prediction2[0]-bf
+            conclusion = round(conclusion, 0)
+            if conclusion>=7:
+                conclusion=conclusion-6
+                bf1=round(prediction2[0]-conclusion,3)
+            else:
+                conclusion=conclusion-2.5
+                bf1=round(prediction2[0] + conclusion,3)
+            return bf1,bmi,bf,bmr
+        
             
     elif bmi <= 29.9:  
             if bf > prediction2[0]:  
                 conclusion = bf - prediction2[0]
                 conclusion = round(conclusion, 0)
                 if conclusion>=10:
-                    bf1=round(prediction2[0])
+                    conclusion=conclusion-5
+                    bf1=round(prediction2[0]-conclusion,3)
                 else:
                     bf1=round(prediction2[0] + conclusion,3)
                 return bf1,bmi,bf,bmr
             else:
                 conclusion = prediction2[0]-bf
                 conclusion = round(conclusion, 0)
-                bf1=round(prediction2[0] + conclusion,3)
+                if conclusion>=10:
+                    conclusion=conclusion-5
+                    bf1=round(prediction2[0]-conclusion,3)
+                else:
+                    bf1=round(prediction2[0] + conclusion,3)
                 return bf1,bmi,bf,bmr
     else:  
                 if bf > prediction2[0]:  
                     conclusion = bf - prediction2[0]
                     conclusion = round(conclusion, 0)
                     if conclusion>=10:
-                        bf1=round(prediction2[0])
+                        conclusion=conclusion-5
+                        bf1=round(prediction2[0]-conclusion,3)
                     else:
                         bf1=round(prediction2[0] + conclusion,3)
                     return bf1,bmi,bf,bmr
@@ -97,7 +122,8 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip):
                     conclusion = prediction2[0] - bf
                     conclusion = round(conclusion, 0)
                     if conclusion>=10:
-                        bf1=round(prediction2[0])
+                        conclusion=conclusion-5
+                        bf1=round(prediction2[0]-conclusion,3)
                     else:
                         bf1=round(prediction2[0] + conclusion,3)
                     return bf1,bmi,bf,bmr
@@ -126,8 +152,8 @@ def main():
     sheet = gc.open_by_url(sheet_url).sheet1
 
     # Insert a row into the Google Sheet.
-    def insert_row(uid, name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
-        row = [uid, name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1]
+    def insert_row(uid,gender ,name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
+        row = [uid,gender,name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1]
         sheet.insert_row(row, 2)  # Insert the row at the second row (after the header).
         st.success('Stored for futher calculations.')
         ###
@@ -139,6 +165,41 @@ def main():
             alphanumeric = string.ascii_uppercase + string.digits
             id = ''.join(random.choice(alphanumeric) for _ in range(length))
             return id
+    def classify_body_fat_percentage(gender, body_fat_percentage,bmr):
+        if gender == "Female":
+            if body_fat_percentage < 14:
+                bmrf=bmr+400
+                return f'Focus on weight gain  and  eat upto {bmrf} '
+            elif 14 <= body_fat_percentage < 21:
+                bmrf=bmr+400
+                return f'Focus on weight gain / maintain and eat upto {bmrf} and to maintain eat atleast {bmr} '
+            elif 21 <= body_fat_percentage < 25:
+                bmrf=bmr-400
+                return f'Focus on weight loss and maintain and eat atleast {bmrf} and to maintain eat atleast {bmr} and check  our 21 days plan'
+            elif 25 <= body_fat_percentage < 32:
+                bmrf=bmr-400
+                return f'Focus on weight loss and eat atleast {bmrf} and check  our 21 days plan'
+            else:
+                bmrf=bmr-400
+                return f'Primary Focus on weight loss and choose our 21 days plan eat atleast {bmrf}'
+        elif gender == "Male":
+            if body_fat_percentage < 6:
+                bmrf=bmr+400
+                return f'Focus on weight gain  and  eat upto {bmrf} '
+            elif 6 <= body_fat_percentage < 14:
+                bmrf=bmr+400
+                return f'Focus on weight gain / maintain and eat upto {bmrf} and to maintain eat atleast {bmr}'
+            elif 14 <= body_fat_percentage < 18:
+                bmrf=bmr-400
+                return f'Focus on weight loss and maintain and eat atleast {bmrf} and to maintain eat atleast {bmr} and check  our 21 days plan'
+            elif 18 <= body_fat_percentage < 25:
+                bmrf=bmr-400
+                return f'Focus on weight loss and eat atleast {bmrf} and check  our 21 days plan'
+            else:
+                bmrf=bmr-400
+                return f'Primary Focus on weight loss and choose our 21 days plan eat atleast {bmrf}'
+        else:
+            return ""
     
 
 
@@ -195,7 +256,7 @@ def main():
             st.write('Your BMI is :',round(bmi1,1))
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
-            insert_row(uid, name,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+            insert_row(uid,gender, name,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
         
     if selected=="Your target Calories intake":
         conn = connect(credentials=credentials)
@@ -253,24 +314,34 @@ def main():
                 if len(rows) == 0:
                     st.warning('No results found. please check your body fat percentage first ')
                 else:
-                    df = DataFrame(rows, columns=['uid', 'name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
+                    df = DataFrame(rows, columns=['uid','gender','name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
                     bmr2=df.loc[0, 'bmr']
+                    bmr2=round(bmr2,2)
                     name1=df.loc[0, 'name']
+                    bodyfat1=df.loc[0, 'bodyfat']
+                    gen=df.loc[0, 'gender']
                     # create radio button to select fitness goal
                     id1=id1.upper()
                     uid1=df.loc[0, 'uid']
+                    ai_pred=classify_body_fat_percentage(gen,bodyfat1,bmr2)
                     if uid1==id1:# display selected fitness goal
                         if fitness_goal == "Weight Loss":
                             wl=bmr2-400
                             st.write("HEY! ",name1)
+                            st.write("Your bodyfat Percentage is ",bodyfat1)
                             st.write("You have selected weight loss and your bmr is ",round(bmr2,2),"You have eat upto ",round(wl),"calories")
+                            st.success(f'According to our AI : {name1} your aim should be {ai_pred}')
                         elif fitness_goal == "Weight Gain":
                             wg=bmr2+400
                             st.write("HEY! ",name1)
+                            st.write("Your bodyfat Percentage is ",bodyfat1)
                             st.write("You have selected weight gain and your bmr is ",round(bmr2,2),"You have eat atleast ",round(wg),"calories")
+                            st.success(f'According to our AI : {name1} your aim should be {ai_pred}')
                         else:
                             st.write("HEY! ",name1)
+                            st.write("Your bodyfat Percentage is ",bodyfat1)
                             st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2),"calories")
+                            st.success(f'According to our AI : {name1} your aim should be {ai_pred}')
                     else:
                         random_err = random.randint(0, len(error_msg2)-1)
                         st.warning(error_msg2[random_err])
@@ -299,9 +370,12 @@ def main():
             if len(rows) == 0:
                 st.warning('No results found. please check your body fat percentage first ')
             else:
-                df = DataFrame(rows, columns=['uid', 'name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
+                df = DataFrame(rows, columns=['uid','gender', 'name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
                 bmr3=df.loc[0, 'bmr']
                 name1=df.loc[0, 'name']
+                bodyfat1=df.loc[0, 'bodyfat']
+                gen=df.loc[0, 'gender']
+
 
                 starting_weight = df.loc[0, 'Weight']
                 starting_weight=starting_weight/2.205# pounds
@@ -393,6 +467,7 @@ def main():
             if uid1==id1:
                 st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
                 st.write("***REPORT***")
+                st.write("So ",name1," your bodyfat Percentage is ",bodyfat1)
                 st.write("For results like this you have to walk altleats ",daily_steps," steps daily and do ",exercise,"for ",plans," daily")
                 st.write("This will lead you to burn ",(daily_steps * 0.05)," calories"," from ",daily_steps," steps and by ",exercise,"for ",plans," you will burn ",round(exercise_calories,2)," calories")
                 st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",daily_calorie_deficit )
