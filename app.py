@@ -203,6 +203,28 @@ def main():
         fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
         
         id1=st.text_input("Enter your UID number :",max_chars=8)
+        error_msg2 = [
+                    "INVALID-UID- What kind of fitness enthusiast you are that you cant remember your UID then how you gonna remember how much calories you ate",
+                    "INVALID-UID- Looks like you're not just losing weight, you're also losing your memory!",
+                    "INVALID-UID- I guess i'll have to work on toning those brain muscles before we tackle your body.",
+                    "INVALID-UID- Let's hope you have a better handle on your calorie count than your UID.",
+                    "INVALID-UID- Oh no, did you accidentally eat your UID for breakfast this morning?",
+                    "INVALID-UID- If only losing weight was as easy as losing your UID!",
+                    "INVALID-UID- Don't worry, we'll help you burn off those extra calories you consumed while searching for your UID.",
+                    "INVALID-UID- Looks like someone needs a little more brain food to remember their UID!",
+                    "INVALID-UID- Just remember, losing weight doesn't have to mean losing your mind (or your UID)!",
+                    "INVALID-UID- If you can't remember your UID, I know you might know where you get best burger in town",
+                    "INVALID-UID- I'm starting to think that your Invalid UID is my arch-nemesis.",
+                    "INVALID-UID- I tried to use your Invalid UID as a password, but apparently it wasn't strong enough, it was mentioned its too easy",
+                    "INVALID-UID- I think I need to hire a private investigator to help me find your Invalid UID, but still you don't remember it.",
+                    "INVALID-UID- If I had a dollar for every time you entered an invalid UID, I'd be a millionaire by now.",
+                    "INVALID-UID- This is frustating now it was just 8 digit number how can you cant remember 8 digit number do you know your contact number ?",
+                    "INVALID-UID- I feel bad about forgetting your UID, just think of it as an opportunity to exercise your brain with some memory training exercises. just before training your body",
+                    "INVALID-UID- We're sorry you're having trouble with your UID, but think of it this way, at least you're not a goldfish who forgets everything in 5 seconds.",
+                    "INVALID-UID- Don't worry, we won't make you feel bad about forgetting your UID, that's what family and friends are for.",
+                    "INVALID-UID- Ah, the classic case of UID amnesia. It's a common affliction, but thankfully there's a cure: writing things down.",
+                    "INVALID-UID- Maybe you should try writing it down next time. You know, like we did in kindergarten."
+                ]
         
         
         
@@ -239,7 +261,8 @@ def main():
                             st.write("HEY! ",name1)
                             st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2),"calories")
                     else:
-                        st.warning("What kind of fitness enthusiast you are that you cant remember your UID then how you gonna remember how much calories you ate")
+                        random_err = random.randint(0, len(error_msg2)-1)
+                        st.warning(error_msg2[random_err])
 
 
     if selected=="21 days weight loss guide":
@@ -247,7 +270,7 @@ def main():
         st.experimental_singleton
         plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
         exercise = st.radio("Whats your type of workout you plan to do  ", ("High intensity workout", "Low intensity workout", "Moderate intensity workout"))
-        id1=st.text_input("Enter your UID number :")
+        id1=st.text_input("Enter your UID number :",max_chars=8)
         email1 = st.text_input('Enter Email:')
         email1=email1.lower()
         
@@ -333,6 +356,29 @@ def main():
             final_weight = weight_df.iloc[-1]['Weight']
             id1=id1.upper()
             uid1=df.loc[0, 'uid']
+            error_msg = [
+                        "INVALID-UID- I'm starting to think that your Invalid UID is my arch-nemesis.",
+                        "INVALID-UID- I tried to use your Invalid UID as a password, but apparently it wasn't strong enough, it was mentioned its too easy",
+                        "INVALID-UID- I think I need to hire a private investigator to help me find your Invalid UID, but still you don't remember it.",
+                        "INVALID-UID- If I had a dollar for every time you entered an invalid UID, I'd be a millionaire by now.",
+                        "INVALID-UID- This is frustating now it was just 8 digit number how can you cant remember 8 digit number do you know your contact number ?",
+                        "INVALID-UID- I feel bad about forgetting your UID, just think of it as an opportunity to exercise your brain with some memory training exercises. just before training your body",
+                        "INVALID-UID- We're sorry you're having trouble with your UID, but think of it this way, at least you're not a goldfish who forgets everything in 5 seconds.",
+                        "INVALID-UID- Don't worry, we won't make you feel bad about forgetting your UID, that's what family and friends are for.",
+                        "INVALID-UID- Ah, the classic case of UID amnesia. It's a common affliction, but thankfully there's a cure: writing things down.",
+                        "INVALID-UID- Maybe you should try writing it down next time. You know, like we did in kindergarten."
+                        "INVALID-UID- What kind of fitness enthusiast you are that you cant remember your UID then how you gonna remember how much calories you ate",
+                        "INVALID-UID- Looks like you're not just losing weight, you're also losing your memory!",
+                        "INVALID-UID- I guess i'll have to work on toning those brain muscles before we tackle your body.",
+                        "INVALID-UID- Let's hope you have a better handle on your calorie count than your UID.",
+                        "INVALID-UID- Oh no, did you accidentally eat your UID for breakfast this morning?",
+                        "INVALID-UID- If only losing weight was as easy as losing your UID!",
+                        "INVALID-UID- Don't worry, we'll help you burn off those extra calories you consumed while searching for your UID.",
+                        "INVALID-UID- Looks like someone needs a little more brain food to remember their UID!",
+                        "INVALID-UID- Just remember, losing weight doesn't have to mean losing your mind (or your UID)!",
+                        "INVALID-UID- If you can't remember your UID, I know you might know where you get best burger in town",
+                    ]
+
             if uid1==id1:
                 st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
                 st.write("***REPORT***")
@@ -346,7 +392,9 @@ def main():
                 st.write("Click the link below")
                 st.markdown(link, unsafe_allow_html=True)
             else:
-                st.error("INVALID UID-This is frustating now it was just 8 digit number how can you cant remember 8 digit number do you know your contact number ?")
+                random_err = random.randint(0, len(error_msg)-1)
+
+                st.error(error_msg[random_err])
             
 
 if __name__=='__main__': 
