@@ -32,7 +32,7 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip):
     height=float(Height)
     height=height*2.54
     weight=float(Weight)
-    weight=weight*2.205
+    weight=weight/2.205
     body_fat_perc=0
     bmr=0
     if gender == "Male":
@@ -40,7 +40,7 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip):
         bmr = (3.397*weight)+ (4.799*height) - (5.677*Age) + 88.362
 # Calculating body fat percentage for females
     elif gender == "Female":
-        body_fat_perc = 495 / (1.29579 - 0.35004 * (math.log10(Abdomen + Hip - Neck)) + 0.22100 * (math.log10(Height))) - 450
+        body_fat_perc = 495 / (1.29579 - 0.35004 * (math.log10(Abdomen + Hip - Neck)) + 0.22100 * (math.log10(height))) - 450
         bmr=(9.247*weight) + (3.098*height) - (4.330*Age) + 447.593
     else:
         return "Invalid input. Please enter M or F for gender."
@@ -73,7 +73,10 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip):
             if bf > prediction2[0]:  
                 conclusion = bf - prediction2[0]
                 conclusion = round(conclusion, 0)
-                bf1=round(prediction2[0] + conclusion,3)
+                if conclusion>=10:
+                    bf1=round(prediction2[0])
+                else:
+                    bf1=round(prediction2[0] + conclusion,3)
                 return bf1,bmi,bf,bmr
             else:
                 conclusion = prediction2[0]-bf
@@ -84,13 +87,21 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip):
                 if bf > prediction2[0]:  
                     conclusion = bf - prediction2[0]
                     conclusion = round(conclusion, 0)
-                    bf1=round(prediction2[0] + conclusion,3)
+                    if conclusion>=10:
+                        bf1=round(prediction2[0])
+                    else:
+                        bf1=round(prediction2[0] + conclusion,3)
                     return bf1,bmi,bf,bmr
+                    
                 else:
                     conclusion = prediction2[0] - bf
                     conclusion = round(conclusion, 0)
-                    bf1=round(prediction2[0] + conclusion,3)
+                    if conclusion>=10:
+                        bf1=round(prediction2[0])
+                    else:
+                        bf1=round(prediction2[0] + conclusion,3)
                     return bf1,bmi,bf,bmr
+                    
 def main():
     page_title="AI Bodyfat percentage calculator"
     page_icon=":chart_with_downwards_trend:"
