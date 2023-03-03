@@ -138,6 +138,7 @@ def main():
         uid=""
         uid=generate_id()
         uid=uid.upper()
+        st.experimental_singleton
         email = st.text_input('Enter your email')
         if email and not validate_email(email):
             st.warning('Please enter a valid email address')
@@ -203,6 +204,7 @@ def main():
         if email1:
             st.success(f'Email entered: {email1}')
         email1=email1.lower()
+        id1=id1.upper()
         
         
 
@@ -248,6 +250,7 @@ def main():
         id1=st.text_input("Enter your UID number :")
         email1 = st.text_input('Enter Email:')
         email1=email1.lower()
+        id1=id1.upper()
         
        
         def run_query(query):
@@ -343,7 +346,7 @@ def main():
                 st.write("Click the link below")
                 st.markdown(link, unsafe_allow_html=True)
             else:
-                st.error("INVALID UID-This is frustating now it was just 8 digit number how can you cant remember 8 digit number do you know your contact number ?")
+                st.error("INVALID UID-This is frustating",name1, "now it was just 8 digit number how can you cant remember 8 digit number do you know your contact number ?")
             
 
 if __name__=='__main__': 
