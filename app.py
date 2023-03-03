@@ -19,7 +19,7 @@ from gsheetsdb import connect
 import pandas as pd
 import random
 import string
-
+import re
 
 
 
@@ -100,8 +100,7 @@ def main():
     selected=option_menu( 
         menu_title=None,
         options=["Predicting Bodyfat percent","Your target Calories intake","21 days weight loss guide"],
-        icons=["cpu-fill","activity","calendar-check"],
-        orientation="horizontal",
+        orientation="horizontal"
         )
 
     ###
@@ -129,6 +128,7 @@ def main():
             alphanumeric = string.ascii_uppercase + string.digits
             id = ''.join(random.choice(alphanumeric) for _ in range(length))
             return id
+    
 
 
     if selected=="Predicting Bodyfat percent":
@@ -138,7 +138,6 @@ def main():
         uid=""
         uid=generate_id()
         uid=uid.upper()
-        st.experimental_singleton
         email = st.text_input('Enter your email')
         if email and not validate_email(email):
             st.warning('Please enter a valid email address')
@@ -194,17 +193,18 @@ def main():
 #AND email="{email}"
 # Get user input for ID and email.
         email1 = st.text_input('Enter Email:')
-        fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
-        
-        id1=st.text_input("Enter your UID number :")
         if email1 and not validate_email(email1):
             st.warning('Please enter a valid email address')
 
         # Display email to user
         if email1:
             st.success(f'Email entered: {email1}')
-        email1=email1.lower()
-        id1=id1.upper()
+            email1=email1.lower()
+        fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
+        
+        id1=st.text_input("Enter your UID number :",max_chars=8)
+        
+        
         
         
 
@@ -224,7 +224,7 @@ def main():
                     bmr2=df.loc[0, 'bmr']
                     name1=df.loc[0, 'name']
                     # create radio button to select fitness goal
-                    
+                    id1=id1.upper()
                     uid1=df.loc[0, 'uid']
                     if uid1==id1:# display selected fitness goal
                         if fitness_goal == "Weight Loss":
@@ -239,7 +239,7 @@ def main():
                             st.write("HEY! ",name1)
                             st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2),"calories")
                     else:
-                        st.error("What kind of fitness enthusiast you are that you cant remember your UID then how you gonna remember how much calories you ate")
+                        st.warning("What kind of fitness enthusiast you are that you cant remember your UID then how you gonna remember how much calories you ate")
 
 
     if selected=="21 days weight loss guide":
@@ -250,7 +250,6 @@ def main():
         id1=st.text_input("Enter your UID number :")
         email1 = st.text_input('Enter Email:')
         email1=email1.lower()
-        id1=id1.upper()
         
        
         def run_query(query):
@@ -332,13 +331,14 @@ def main():
 
             # Calculate final weight
             final_weight = weight_df.iloc[-1]['Weight']
+            id1=id1.upper()
             uid1=df.loc[0, 'uid']
             if uid1==id1:
                 st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
                 st.write("***REPORT***")
                 st.write("For results like this you have to walk altleats ",daily_steps," steps daily and do ",exercise,"for ",plans," daily")
                 st.write("This will lead you to burn ",(daily_steps * 0.05)," calories"," from ",daily_steps," steps and by ",exercise,"for ",plans," you will burn ",round(exercise_calories,2)," calories")
-                st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",round(daily_calorie_deficit,2) )
+                st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",daily_calorie_deficit )
                 st.write("If you wanna lose ",round(round(starting_weight,2)-round(final_weight,2),2)," kgs Read our Weight loss ebook which is completely free for now")
                 st.write("1:- ***In this ebook you will learn what Kind of workouts shoul do in***",exercise)
                 st.write("2:- ***Plus you will also get insights what should be your diet according to your calories i.e.*** ",round(wl,0))
@@ -346,7 +346,7 @@ def main():
                 st.write("Click the link below")
                 st.markdown(link, unsafe_allow_html=True)
             else:
-                st.error("INVALID UID-This is frustating",name1, "now it was just 8 digit number how can you cant remember 8 digit number do you know your contact number ?")
+                st.error("INVALID UID-This is frustating now it was just 8 digit number how can you cant remember 8 digit number do you know your contact number ?")
             
 
 if __name__=='__main__': 
