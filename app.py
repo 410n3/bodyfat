@@ -20,7 +20,7 @@ import pandas as pd
 import random
 import string
 import re
-
+import pdfkit
 
 
 
@@ -481,27 +481,28 @@ def main():
                 random_err = random.randint(0, len(error_msg)-1)
 
                 st.error(error_msg[random_err])
-        import pdfkit
+        
 
         # Define the HTML content to be included in the PDF
-        html = f"""
-            <h2>HEY! {name1}</h2>
-            <p>Your present weight is {round(starting_weight,2)} kgs and final weight after 21 days according to our plan would be {round(final_weight,2)} kgs</p>
-            <h3>REPORT</h3>
-            <p>So {name1}, your bodyfat Percentage is {bodyfat1}</p>
-            <p>For results like this you have to walk at least {daily_steps} steps daily and do {exercise} for {plans} daily</p>
-            <p>This will lead you to burn {daily_steps * 0.05} calories from {daily_steps} steps and by {exercise} for {plans} you will burn {round(exercise_calories,2)} calories</p>
-            <p>YOUR DAILY CALORIE EXPENDITURE WOULD BE: {daily_calorie_deficit}</p>
-            <p>If you wanna lose {round(round(starting_weight,2)-round(final_weight,2),2)} kgs, read our Weight loss ebook which is completely free for now</p>
-            <ol>
-                <li><strong>In this ebook you will learn what kind of workouts should do in {exercise}</strong></li>
-                <li><strong>Plus you will also get insights what should be your diet according to your calories i.e. {round(wl,0)}</strong></li>
-            </ol>
-            <p><a href='https://www.dietncity.com' target='_blank'>FREE EBOOK</a></p>
-        """
+        
 
         # Create a button to download the PDF
         if st.button('Download PDF'):
+            html = f"""
+                <h2>HEY! {name1}</h2>
+                <p>Your present weight is {round(starting_weight,2)} kgs and final weight after 21 days according to our plan would be {round(final_weight,2)} kgs</p>
+                <h3>REPORT</h3>
+                <p>So {name1}, your bodyfat Percentage is {bodyfat1}</p>
+                <p>For results like this you have to walk at least {daily_steps} steps daily and do {exercise} for {plans} daily</p>
+                <p>This will lead you to burn {daily_steps * 0.05} calories from {daily_steps} steps and by {exercise} for {plans} you will burn {round(exercise_calories,2)} calories</p>
+                <p>YOUR DAILY CALORIE EXPENDITURE WOULD BE: {daily_calorie_deficit}</p>
+                <p>If you wanna lose {round(round(starting_weight,2)-round(final_weight,2),2)} kgs, read our Weight loss ebook which is completely free for now</p>
+                <ol>
+                    <li><strong>In this ebook you will learn what kind of workouts should do in {exercise}</strong></li>
+                    <li><strong>Plus you will also get insights what should be your diet according to your calories i.e. {round(wl,0)}</strong></li>
+                </ol>
+                <p><a href='https://www.dietncity.com' target='_blank'>FREE EBOOK</a></p>
+            """
             # Define the PDF options
             pdf_options = {
                 'page-size': 'Letter',
