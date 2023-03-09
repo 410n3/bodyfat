@@ -20,6 +20,9 @@ import pandas as pd
 import random
 import string
 import re
+from fpdf import FPDF
+import os
+
 
 
 
@@ -136,7 +139,7 @@ def main():
     st.title(page_icon + " " + page_title)
     selected=option_menu( 
         menu_title=None,
-        options=["Predicting Bodyfat percent","Your target Calories intake","21 days weight loss guide"],
+        options=["Predicting Bodyfat percent","Your target Calories intake","21 days weight loss guide","Download your data"],
         orientation="horizontal"
         )
 
@@ -150,6 +153,9 @@ def main():
     gc = gspread.authorize(credentials)
     sheet_url = st.secrets["private_gsheets_url"]
     sheet = gc.open_by_url(sheet_url).sheet1
+    sheet_url_ui = st.secrets["private_gsheets_url1"]
+    sheet_ui = gc.open_by_url(sheet_url_ui).sheet1
+    
 
     # Insert a row into the Google Sheet.
     def insert_row(uid,gender ,name, email, Age, Weight, Height, bmi1, bmr1, bf2, bf1):
@@ -157,6 +163,12 @@ def main():
         sheet.insert_row(row, 2)  # Insert the row at the second row (after the header).
         st.success('Stored for futher calculations.')
         ###
+    def insert_row_ui(uid,name,email,age,weight,height,neck,chest,abdomen,hip):
+        row = [uid,name, email, Age, Weight, Height, Neck, Chest, Abdomen, Hip]
+        sheet_ui.insert_row(row, 2)  # Insert the row at the second row (after the header).
+        st.success('Stored for futher calculations.')
+        ###
+    
     def validate_email(email):
         # A simple regex to validate email format
         import re
@@ -257,6 +269,7 @@ def main():
             st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
             st.write('Your BMR  is :',round(bmr1,2))
             insert_row(uid,gender, name,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+            insert_row_ui(uid,name, email, Age, Weight, Height, Neck, Chest, Abdomen, Hip)
         
     if selected=="Your target Calories intake":
         conn = connect(credentials=credentials)
@@ -348,6 +361,11 @@ def main():
 
 
     if selected=="21 days weight loss guide":
+        selected1=option_menu( 
+            menu_title=None,
+            options=["Download your pdf"],
+            orientation="horizontal"
+            )
         conn = connect(credentials=credentials)
         st.experimental_singleton
         plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
@@ -465,6 +483,7 @@ def main():
                     ]
 
             if uid1==id1:
+                
                 st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
                 st.write("***REPORT***")
                 st.write("So ",name1," your bodyfat Percentage is ",bodyfat1)
@@ -481,7 +500,74 @@ def main():
                 random_err = random.randint(0, len(error_msg)-1)
 
                 st.error(error_msg[random_err])
+    if selected=='Download your data':
+        st.title('Body Composition')
+        class PDF(FPDF):
+                def body_composition(self,uid,name,age, weight, height, body_fat,bmr):
+                    self.set_font('Arial', 'B', 16)
+                    self.cell(0, 10, 'Body Composition', 0, 1)
+                    self.set_font('Arial', '', 12)
+                    self.cell(50, 10, 'Uid:', 0, 0)
+                    self.cell(50, 10, str(uid) + ' ', 0, 1)
+                    self.cell(50, 10, 'Name:', 0, 0)
+                    self.cell(50, 10, str(name) + ' ', 0, 1)
+                    self.cell(50, 10, 'Age:', 0, 0)
+                    self.cell(50, 10, str(age) + ' yrs', 0, 1)
+                    self.cell(50, 10, 'Weight:', 0, 0)
+                    self.cell(50, 10, str(weight) + ' pounds', 0, 1)
+                    self.cell(50, 10, 'Height:', 0, 0)
+                    self.cell(50, 10, str(height) + ' inches', 0, 1)
+                    self.cell(50, 10, 'Body Fat Percentage:', 0, 0)
+                    self.cell(50, 10, str(body_fat) + '%', 0, 1)
+                    self.cell(50, 10, 'Your BMR is :', 0, 0)
+                    self.cell(50, 10, str(round(bmr,2)) + 'cl', 0, 1)
+                    self.ln()
+        conn = connect(credentials=credentials)
+        st.experimental_singleton
+        id1=st.text_input("Enter your UID number :",max_chars=8)
+        email1 = st.text_input('Enter Email:')
+        email1=email1.lower()
             
+        
+       
+        if st.button('Export to PDF'):
+            # Create a new PDF document
+            
+            
+           
+            def run_query(query):
+                rows = conn.execute(query, headers=1)
+                rows = rows.fetchall()
+                return rows
+            rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"')
+            if len(rows) == 0:
+                    st.warning('No results found. please check your body fat percentage first ')
+            else:
+                    df = DataFrame(rows, columns=['uid','gender', 'name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
+                    bmr3=df.loc[0, 'bmr']
+                    uid=df.loc[0, 'uid']
+                    name1=df.loc[0, 'name']
+                    bodyfat1=df.loc[0, 'bodyfat']
+                    weight = df.loc[0, 'Weight']
+                    age= df.loc[0, 'Age']
+                    height=df.loc[0, 'Height']
+            pdf = PDF()
+            pdf.add_page()
+            pdf.body_composition(uid,name1,age, weight, height, bodyfat1,bmr3)
+            # Save the PDF document
+            pdf_file_path = f'{name1}_body_composition.pdf'
+            pdf.output(pdf_file_path, 'F')
+            st.success('PDF file exported successfully!')
+            with open(pdf_file_path, 'rb') as f:
+                pdf_data = f.read()
+            st.download_button('Download PDF', data=pdf_data, file_name=f'{name1}_body_composition.pdf', mime='application/pdf')
+        # Delete the PDF file from the system
+            os.remove(pdf_file_path)
+                
+                
+                
+                
+                        
 
 if __name__=='__main__': 
     main()
