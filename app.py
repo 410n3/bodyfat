@@ -133,13 +133,14 @@ def bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip):
                     
 def main():
     page_title="AI Bodyfat percentage calculator"
-    page_icon=":chart_with_downwards_trend:"
+    page_icon=":chart_with_downwards_trend:" 
     st.set_page_config(page_title=page_title,page_icon=page_icon)
     st.markdown(""" <style> #MainMenu {visibility: hidden;}footer {visibility: hidden;}</style> """, unsafe_allow_html=True)
     st.title(page_icon + " " + page_title)
+    
     selected=option_menu( 
         menu_title=None,
-        options=["Predicting Bodyfat percent","Your target Calories intake","21 days weight loss guide","Download your data"],
+        options=["Predicting Bodyfat percent","Your target Calories intake","21 days weight loss guide"],
         orientation="horizontal"
         )
 
@@ -173,6 +174,67 @@ def main():
         # A simple regex to validate email format
         import re
         return re.match(r"[^@]+@[^@]+\.[^@]+", email)
+    
+    class PDF(FPDF):
+            def body_composition(self,uid,name,age, weight, height, body_fat,bmr,neck,Chest,Abdomen,Hip,text):
+                self.image('logo.png', x=10, y=10, w=44)
+               
+                self.ln(10) # add some space before the next row
+                self.set_font('Helvetica', 'B', 20)
+                self.set_text_color(0, 0, 0) # set font color to dark red
+                self.set_fill_color(96, 252, 96)  # set background color to light blue
+                self.cell(0, 15, 'Body Composition', 0, 1, 'C', True) # add background color
+                
+                self.set_font('Helvetica', '', 14)
+                self.set_text_color(0, 0, 0) # set font color to black
+                self.cell(50, 10, 'Uid:', 0, 0)
+                self.cell(50, 10, str(uid), 0, 1)
+                self.cell(50, 10, 'Name:', 0, 0)
+                self.cell(50, 10, str(name), 0, 1)
+                self.cell(50, 10, 'Age:', 0, 0)
+                self.cell(50, 10, str(age) + ' yrs', 0, 1)
+                self.cell(50, 10, 'Weight:', 0, 0)
+                self.cell(50, 10, str(round(weight)) + ' kgs', 0, 1)
+                self.cell(50, 10, 'Height:', 0, 0)
+                self.cell(50, 10, str(height) + ' inches', 0, 1)
+                
+                self.ln(10) # add some space before the next row
+                
+                self.set_fill_color(112, 255, 107) # set background color to light yellow
+                self.cell(0, 10, '', 0, 1, 'C', True) # add a separator line
+                
+                self.ln(10) # add some space before the next row
+                
+                self.set_font('Helvetica', '', 14)
+                self.set_text_color(0, 0, 0) # set font color to black
+                self.cell(50, 10, 'Neck measurement:', 0, 0)
+                self.cell(50, 10, str(neck) + ' cms', 0, 1)
+                self.cell(50, 10, 'Chest measurement:', 0, 0)
+                self.cell(50, 10, str(Chest) + ' cms', 0, 1)
+                self.cell(50, 10, 'Abdomen measurement:',+"  ", 0, 0)
+                self.cell(50, 10, str(Abdomen) + ' cms', 0, 1)
+                self.cell(50, 10, 'Hip measurement:', 0, 0)
+                self.cell(50, 10, str(Hip) + ' cms', 0, 1)
+                self.cell(50, 10, 'Body Fat Percentage:', 0, 0)
+                self.cell(50, 10, str(body_fat) + '%', 0, 1)
+                
+                self.ln(10) # add some space before the next row
+                
+                self.set_fill_color(112, 255, 107) 
+                self.cell(0, 10, '', 0, 1, 'C', True) # add a separator line
+                
+                self.ln(10) # add some space before the next row
+                
+                self.set_font('Helvetica', '', 14)
+                self.set_text_color(0, 0, 0)
+                pdf.write(5, text)
+
+    
+    
+    
+    
+    
+    
     def generate_id(length=8):
             alphanumeric = string.ascii_uppercase + string.digits
             id = ''.join(random.choice(alphanumeric) for _ in range(length))
@@ -380,19 +442,27 @@ def main():
             rows = rows.fetchall()
             return rows
         rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"')
+        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE email="{email1}"')
         
         if st.button('Your future'):
             
             
             
-            if len(rows) == 0:
+            if len(rows) & len(rows1) == 0:
                 st.warning('No results found. please check your body fat percentage first ')
             else:
+                df1 = DataFrame(rows1, columns=['uid','name','email','age','weight','height','neck','chest','abdomen','hip'])
                 df = DataFrame(rows, columns=['uid','gender', 'name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
                 bmr3=df.loc[0, 'bmr']
                 name1=df.loc[0, 'name']
                 bodyfat1=df.loc[0, 'bodyfat']
                 gen=df.loc[0, 'gender']
+                neck=df1.loc[0, 'neck']
+                chest=df1.loc[0, 'chest']
+                abdomen=df1.loc[0, 'abdomen']
+                hip=df1.loc[0, 'hip']
+                age= df.loc[0, 'Age']
+                height=df.loc[0, 'Height']
 
 
                 starting_weight = df.loc[0, 'Weight']
@@ -483,7 +553,16 @@ def main():
                     ]
 
             if uid1==id1:
-                
+                text = f"HEY! {name1} Your present weight is {round(starting_weight,2)} kgs and final weight after 21 days according to our plan would be {round(final_weight,2)} kgs\n"
+                text += f"So {name1}, your bodyfat Percentage is {bodyfat1}\n"
+                text += f"For results like this you have to walk at least {daily_steps} steps daily and do {exercise} for {plans} daily\n"
+                text += f"This will lead you to burn {daily_steps * 0.05} calories from {daily_steps} steps and by {exercise} for {plans} you will burn {round(exercise_calories,2)} calories\n"
+                text += f"YOUR DAILY CALORIE EXPENDITURE WOULD BE : {daily_calorie_deficit}\n"
+                text += f"If you wanna lose {round(round(starting_weight,2)-round(final_weight,2),2)} kgs Read our Weight loss ebook which is completely free for now\n"
+                text += f"1:- In this ebook you will learn what Kind of workouts should do in {exercise}\n"
+                text += f"2:- Plus you will also get insights what should be your diet according to your calories i.e. {round(wl,0)}"
+
+                                
                 st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
                 st.write("***REPORT***")
                 st.write("So ",name1," your bodyfat Percentage is ",bodyfat1)
@@ -496,73 +575,24 @@ def main():
                 link = "<a href='https://www.dietncity.com' target='_blank'>FREE EBOOK</a>"
                 st.write("Click the link below")
                 st.markdown(link, unsafe_allow_html=True)
+                pdf = PDF()
+                pdf.add_page()
+                pdf.body_composition(uid1,name1,age, starting_weight, height, bodyfat1,bmr3,neck,chest,abdomen,hip,text)
+                pdf_file_path = f'{name1}_body_composition.pdf'
+                pdf.output(pdf_file_path, 'F')
+                st.success('PDF file exported successfully!')
+                with open(pdf_file_path, 'rb') as f:
+                    pdf_data = f.read()
+                st.download_button('Download PDF', data=pdf_data, file_name=f'{name1}_body_composition.pdf', mime='application/pdf')
             else:
                 random_err = random.randint(0, len(error_msg)-1)
 
                 st.error(error_msg[random_err])
-    if selected=='Download your data':
-        st.title('Body Composition')
-        class PDF(FPDF):
-                def body_composition(self,uid,name,age, weight, height, body_fat,bmr):
-                    self.set_font('Arial', 'B', 16)
-                    self.cell(0, 10, 'Body Composition', 0, 1)
-                    self.set_font('Arial', '', 12)
-                    self.cell(50, 10, 'Uid:', 0, 0)
-                    self.cell(50, 10, str(uid) + ' ', 0, 1)
-                    self.cell(50, 10, 'Name:', 0, 0)
-                    self.cell(50, 10, str(name) + ' ', 0, 1)
-                    self.cell(50, 10, 'Age:', 0, 0)
-                    self.cell(50, 10, str(age) + ' yrs', 0, 1)
-                    self.cell(50, 10, 'Weight:', 0, 0)
-                    self.cell(50, 10, str(weight) + ' pounds', 0, 1)
-                    self.cell(50, 10, 'Height:', 0, 0)
-                    self.cell(50, 10, str(height) + ' inches', 0, 1)
-                    self.cell(50, 10, 'Body Fat Percentage:', 0, 0)
-                    self.cell(50, 10, str(body_fat) + '%', 0, 1)
-                    self.cell(50, 10, 'Your BMR is :', 0, 0)
-                    self.cell(50, 10, str(round(bmr,2)) + 'cl', 0, 1)
-                    self.ln()
-        conn = connect(credentials=credentials)
-        st.experimental_singleton
-        id1=st.text_input("Enter your UID number :",max_chars=8)
-        email1 = st.text_input('Enter Email:')
-        email1=email1.lower()
-            
-        
-       
-        if st.button('Export to PDF'):
-            # Create a new PDF document
+    
             
             
            
-            def run_query(query):
-                rows = conn.execute(query, headers=1)
-                rows = rows.fetchall()
-                return rows
-            rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"')
-            if len(rows) == 0:
-                    st.warning('No results found. please check your body fat percentage first ')
-            else:
-                    df = DataFrame(rows, columns=['uid','gender', 'name', 'email', 'Age', 'Weight', 'Height', 'bmi', 'bmr', 'bodyfat', 'bf_bmi'])
-                    bmr3=df.loc[0, 'bmr']
-                    uid=df.loc[0, 'uid']
-                    name1=df.loc[0, 'name']
-                    bodyfat1=df.loc[0, 'bodyfat']
-                    weight = df.loc[0, 'Weight']
-                    age= df.loc[0, 'Age']
-                    height=df.loc[0, 'Height']
-            pdf = PDF()
-            pdf.add_page()
-            pdf.body_composition(uid,name1,age, weight, height, bodyfat1,bmr3)
-            # Save the PDF document
-            pdf_file_path = f'{name1}_body_composition.pdf'
-            pdf.output(pdf_file_path, 'F')
-            st.success('PDF file exported successfully!')
-            with open(pdf_file_path, 'rb') as f:
-                pdf_data = f.read()
-            st.download_button('Download PDF', data=pdf_data, file_name=f'{name1}_body_composition.pdf', mime='application/pdf')
-        # Delete the PDF file from the system
-            os.remove(pdf_file_path)
+            
                 
                 
                 
