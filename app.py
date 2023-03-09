@@ -211,7 +211,7 @@ def main():
                 self.cell(50, 10, str(neck) + ' cms', 0, 1)
                 self.cell(50, 10, 'Chest measurement:', 0, 0)
                 self.cell(50, 10, str(Chest) + ' cms', 0, 1)
-                self.cell(50, 10, 'Abdomen measurement:',+"  ", 0, 0)
+                self.cell(50, 10, 'Abdomen measurement:'+"  ", 0, 0)
                 self.cell(50, 10, str(Abdomen) + ' cms', 0, 1)
                 self.cell(50, 10, 'Hip measurement:', 0, 0)
                 self.cell(50, 10, str(Hip) + ' cms', 0, 1)
