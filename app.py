@@ -423,11 +423,7 @@ def main():
 
 
     if selected=="21 days weight loss guide":
-        selected1=option_menu( 
-            menu_title=None,
-            options=["Download your pdf"],
-            orientation="horizontal"
-            )
+        
         conn = connect(credentials=credentials)
         st.experimental_singleton
         plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
