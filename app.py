@@ -511,24 +511,24 @@ def main():
 
                 # Get the fields you want to replace
                 fields = {
-                    '*name*': name1,
-                    '*age*': age,
-                    '*gen*': gen,
-                    '*weight*': round(starting_weight,2),
-                    '*height*': height,
-                    '*bf*': bodyfat1,
-                    '*bmr*': bmr3,
-                    '*bmi*': bmi2,
-                    '*name1*':name1,
-                    '*starting_weight*':round(starting_weight,2),
-                    '*final_weight*':round(final_weight,2),
-                    '*daily_steps*':daily_steps,
-                    '*exercise*':exercise,
-                    '*plans*':plans,
-                    '*exercise_calories*':exercise_calories,
-                    '*total_weight_loss*':round(round(starting_weight,2)-round(final_weight,2),2),
-                    '*daily_calorie_deficit*':round(daily_calorie_deficit,2),
-                    '*daily_steps_ calories*':(daily_steps * 0.05)
+                    '*name*': f'{name1}',
+                    '*age*': f'{age}',
+                    '*gen*': f'{gen}',
+                    '*weight*': f'{round(starting_weight,2)}',
+                    '*height*': f'{height}',
+                    '*bf*': f'{bodyfat1}',
+                    '*bmr*': f'{bmr3}',
+                    '*bmi*': f'{bmi2}',
+                    '*name1*':f'{name1}',
+                    '*starting_weight*':f'{round(starting_weight,2)}',
+                    '*final_weight*':f'{round(final_weight,2)}',
+                    '*daily_steps*':f'{daily_steps}',
+                    '*exercise*':f'{exercise}',
+                    '*plans*':f'{plans}',
+                    '*exercise_calories*':f'{exercise_calories}',
+                    '*total_weight_loss*':f'{round(round(starting_weight,2)-round(final_weight,2),2)}',
+                    '*daily_calorie_deficit*':f'{round(daily_calorie_deficit,2)}',
+                    '*daily_steps_ calories*':f'{(daily_steps * 0.05)}'
                     
                     
                     
