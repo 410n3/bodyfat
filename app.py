@@ -20,8 +20,9 @@ import pandas as pd
 import random
 import string
 import re
-from fpdf import FPDF
 import os
+import docx
+import base64
 
 
 
@@ -172,63 +173,14 @@ def main():
     
     def validate_email(email):
         # A simple regex to validate email format
-        import re
         return re.match(r"[^@]+@[^@]+\.[^@]+", email)
+    def download_file(file_path):
+        with open(file_path, 'rb') as f:
+            bytes = f.read()
+            b64 = base64.b64encode(bytes).decode()
+            href = f'<a href="data:application/octet-stream;base64,{b64}" download="my_edited_document.docx">Download file</a>'
+            return href
     
-    class PDF(FPDF):
-            def body_composition(self,uid,name,age, weight, height, body_fat,bmr,neck,Chest,Abdomen,Hip,text):
-                self.image('logo.png', x=10, y=10, w=44)
-               
-                self.ln(10) # add some space before the next row
-                self.set_font('Helvetica', 'B', 20)
-                self.set_text_color(0, 0, 0) # set font color to dark red
-                self.set_fill_color(96, 252, 96)  # set background color to light blue
-                self.cell(0, 15, 'Body Composition', 0, 1, 'C', True) # add background color
-                
-                self.set_font('Helvetica', '', 14)
-                self.set_text_color(0, 0, 0) # set font color to black
-                self.cell(50, 10, 'Uid:', 0, 0)
-                self.cell(50, 10, str(uid), 0, 1)
-                self.cell(50, 10, 'Name:', 0, 0)
-                self.cell(50, 10, str(name), 0, 1)
-                self.cell(50, 10, 'Age:', 0, 0)
-                self.cell(50, 10, str(age) + ' yrs', 0, 1)
-                self.cell(50, 10, 'Weight:', 0, 0)
-                self.cell(50, 10, str(round(weight)) + ' kgs', 0, 1)
-                self.cell(50, 10, 'Height:', 0, 0)
-                self.cell(50, 10, str(height) + ' inches', 0, 1)
-                
-                self.ln(10) # add some space before the next row
-                
-                self.set_fill_color(112, 255, 107) # set background color to light yellow
-                self.cell(0, 10, '', 0, 1, 'C', True) # add a separator line
-                
-                self.ln(10) # add some space before the next row
-                
-                self.set_font('Helvetica', '', 14)
-                self.set_text_color(0, 0, 0) # set font color to black
-                self.cell(50, 10, 'Neck measurement:', 0, 0)
-                self.cell(50, 10, str(neck) + ' cms', 0, 1)
-                self.cell(50, 10, 'Chest measurement:', 0, 0)
-                self.cell(50, 10, str(Chest) + ' cms', 0, 1)
-                self.cell(50, 10, 'Abdomen measurement:'+"  ", 0, 0)
-                self.cell(50, 10, str(Abdomen) + ' cms', 0, 1)
-                self.cell(50, 10, 'Hip measurement:', 0, 0)
-                self.cell(50, 10, str(Hip) + ' cms', 0, 1)
-                self.cell(50, 10, 'Body Fat Percentage:', 0, 0)
-                self.cell(50, 10, str(body_fat) + '%', 0, 1)
-                
-                self.ln(10) # add some space before the next row
-                
-                self.set_fill_color(112, 255, 107) 
-                self.cell(0, 10, '', 0, 1, 'C', True) # add a separator line
-                
-                self.ln(10) # add some space before the next row
-                
-                self.set_font('Helvetica', '', 14)
-                self.set_text_color(0, 0, 0)
-                pdf.write(5, text)
-
     
     
     
@@ -423,7 +375,11 @@ def main():
 
 
     if selected=="21 days weight loss guide":
-        
+        selected1=option_menu( 
+            menu_title=None,
+            options=["Download your pdf"],
+            orientation="horizontal"
+            )
         conn = connect(credentials=credentials)
         st.experimental_singleton
         plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
@@ -453,6 +409,7 @@ def main():
                 name1=df.loc[0, 'name']
                 bodyfat1=df.loc[0, 'bodyfat']
                 gen=df.loc[0, 'gender']
+                bmi2=df.loc[0, 'bmi']
                 neck=df1.loc[0, 'neck']
                 chest=df1.loc[0, 'chest']
                 abdomen=df1.loc[0, 'abdomen']
@@ -549,37 +506,53 @@ def main():
                     ]
 
             if uid1==id1:
-                text = f"HEY! {name1} Your present weight is {round(starting_weight,2)} kgs and final weight after 21 days according to our plan would be {round(final_weight,2)} kgs\n"
-                text += f"So {name1}, your bodyfat Percentage is {bodyfat1}\n"
-                text += f"For results like this you have to walk at least {daily_steps} steps daily and do {exercise} for {plans} daily\n"
-                text += f"This will lead you to burn {daily_steps * 0.05} calories from {daily_steps} steps and by {exercise} for {plans} you will burn {round(exercise_calories,2)} calories\n"
-                text += f"YOUR DAILY CALORIE EXPENDITURE WOULD BE : {daily_calorie_deficit}\n"
-                text += f"If you wanna lose {round(round(starting_weight,2)-round(final_weight,2),2)} kgs Read our Weight loss ebook which is completely free for now\n"
-                text += f"1:- In this ebook you will learn what Kind of workouts should do in {exercise}\n"
-                text += f"2:- Plus you will also get insights what should be your diet according to your calories i.e. {round(wl,0)}"
+                # Open the Word document
+                doc = docx.Document('template.docx')
 
-                                
-                st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
-                st.write("***REPORT***")
-                st.write("So ",name1," your bodyfat Percentage is ",bodyfat1)
-                st.write("For results like this you have to walk altleats ",daily_steps," steps daily and do ",exercise,"for ",plans," daily")
-                st.write("This will lead you to burn ",(daily_steps * 0.05)," calories"," from ",daily_steps," steps and by ",exercise,"for ",plans," you will burn ",round(exercise_calories,2)," calories")
-                st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",daily_calorie_deficit )
-                st.write("If you wanna lose ",round(round(starting_weight,2)-round(final_weight,2),2)," kgs Read our Weight loss ebook which is completely free for now")
-                st.write("1:- ***In this ebook you will learn what Kind of workouts shoul do in***",exercise)
-                st.write("2:- ***Plus you will also get insights what should be your diet according to your calories i.e.*** ",round(wl,0))
-                link = "<a href='https://www.dietncity.com' target='_blank'>FREE EBOOK</a>"
-                st.write("Click the link below")
-                st.markdown(link, unsafe_allow_html=True)
-                pdf = PDF()
-                pdf.add_page()
-                pdf.body_composition(uid1,name1,age, starting_weight, height, bodyfat1,bmr3,neck,chest,abdomen,hip,text)
-                pdf_file_path = f'{name1}_body_composition.pdf'
-                pdf.output(pdf_file_path, 'F')
-                st.success('PDF file exported successfully!')
-                with open(pdf_file_path, 'rb') as f:
-                    pdf_data = f.read()
-                st.download_button('Download PDF', data=pdf_data, file_name=f'{name1}_body_composition.pdf', mime='application/pdf')
+                # Get the fields you want to replace
+                fields = {
+                    '*name*': name1,
+                    '*age*': age,
+                    '*gen*': gen,
+                    '*weight*': round(starting_weight,2),
+                    '*height*': height,
+                    '*bf*': bodyfat1,
+                    '*bmr*': bmr3,
+                    '*bmi*': bmi2,
+                    '*name1*':name1,
+                    '*starting_weight*':round(starting_weight,2),
+                    '*final_weight*':round(final_weight,2),
+                    '*daily_steps*':daily_steps,
+                    '*exercise*':exercise,
+                    '*plans*':plans,
+                    '*exercise_calories*':exercise_calories,
+                    '*total_weight_loss*':round(round(starting_weight,2)-round(final_weight,2),2),
+                    '*daily_calorie_deficit*':round(daily_calorie_deficit,2),
+                    '*daily_steps_ calories*':(daily_steps * 0.05)
+                    
+                    
+                    
+                }
+
+                # Loop through each paragraph in the document
+                for paragraph in doc.paragraphs:
+                    # Loop through each field in the fields dictionary
+                    for field, value in fields.items():
+                        # Check if the field is in the paragraph text
+                        if field in paragraph.text:
+                            # Replace the field with the value
+                            paragraph.text = paragraph.text.replace(field, value)
+
+                # Save the edited document
+                doc.save(f'{name1}_fitness_report.docx')
+                file_path = f'{name1}_fitness_report.docx'
+                with open(file_path, 'rb') as f:
+                    file_bytes = f.read()
+                st.download_button(
+                    label='Download fitness report',
+                    data=file_bytes,
+                    file_name=f'{name1}_fitness_report.docx')
+                os.remove(file_path)
             else:
                 random_err = random.randint(0, len(error_msg)-1)
 
