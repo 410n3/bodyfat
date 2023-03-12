@@ -8,4 +8,4 @@ streamlit
 streamlit_option_menu
 pdfkit
 fpdf
-python-docx
+pypdf
