@@ -21,8 +21,8 @@ import random
 import string
 import re
 import os
-import docx
-import base64
+from pypdf import PdfReader, PdfWriter
+
 
 
 
@@ -375,11 +375,6 @@ def main():
 
 
     if selected=="21 days weight loss guide":
-        selected1=option_menu( 
-            menu_title=None,
-            options=["Download your pdf"],
-            orientation="horizontal"
-            )
         conn = connect(credentials=credentials)
         st.experimental_singleton
         plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
@@ -416,6 +411,7 @@ def main():
                 hip=df1.loc[0, 'hip']
                 age= df.loc[0, 'Age']
                 height=df.loc[0, 'Height']
+                
 
 
                 starting_weight = df.loc[0, 'Weight']
@@ -506,53 +502,44 @@ def main():
                     ]
 
             if uid1==id1:
-                # Open the Word document
-                doc = docx.Document('template.docx')
+                st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
+                st.write("***REPORT***")
+                st.write("So ",name1," your bodyfat Percentage is ",bodyfat1)
+                st.write("For results like this you have to walk altleats ",daily_steps," steps daily and do ",exercise,"for ",plans," daily")
+                st.write("This will lead you to burn ",(daily_steps * 0.05)," calories"," from ",daily_steps," steps and by ",exercise,"for ",plans," you will burn ",round(exercise_calories,2)," calories")
+                st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",daily_calorie_deficit )
+                st.write("If you wanna lose ",round(round(starting_weight,2)-round(final_weight,2),2)," kgs Read our Weight loss ebook which is completely free for now")
+                st.write("1:- ***In this ebook you will learn what Kind of workouts shoul do in***",exercise)
+                st.write("2:- ***Plus you will also get insights what should be your diet according to your calories i.e.*** ",round(wl,0))
+                link = "<a href='https://www.dietncity.com' target='_blank'>FREE EBOOK</a>"
+                st.write("Click the link below")
+                st.markdown(link, unsafe_allow_html=True)
+                ##pdf document
+                reader = PdfReader("template.pdf")
+                writer = PdfWriter()
 
-                # Get the fields you want to replace
-                fields = {
-                    '*name*': f'{name1}',
-                    '*age*': f'{age}',
-                    '*gen*': f'{gen}',
-                    '*weight*': f'{round(starting_weight,2)}',
-                    '*height*': f'{height}',
-                    '*bf*': f'{bodyfat1}',
-                    '*bmr*': f'{bmr3}',
-                    '*bmi*': f'{bmi2}',
-                    '*name1*':f'{name1}',
-                    '*starting_weight*':f'{round(starting_weight,2)}',
-                    '*final_weight*':f'{round(final_weight,2)}',
-                    '*daily_steps*':f'{daily_steps}',
-                    '*exercise*':f'{exercise}',
-                    '*plans*':f'{plans}',
-                    '*exercise_calories*':f'{exercise_calories}',
-                    '*total_weight_loss*':f'{round(round(starting_weight,2)-round(final_weight,2),2)}',
-                    '*daily_calorie_deficit*':f'{round(daily_calorie_deficit,2)}',
-                    '*daily_steps_ calories*':f'{(daily_steps * 0.05)}'
-                    
-                    
-                    
-                }
+                page = reader.pages[0]
+                
 
-                # Loop through each paragraph in the document
-                for paragraph in doc.paragraphs:
-                    # Loop through each field in the fields dictionary
-                    for field, value in fields.items():
-                        # Check if the field is in the paragraph text
-                        if field in paragraph.text:
-                            # Replace the field with the value
-                            paragraph.text = paragraph.text.replace(field, value)
-
-                # Save the edited document
-                doc.save(f'{name1}_fitness_report.docx')
-                file_path = f'{name1}_fitness_report.docx'
-                with open(file_path, 'rb') as f:
-                    file_bytes = f.read()
-                st.download_button(
-                    label='Download fitness report',
-                    data=file_bytes,
-                    file_name=f'{name1}_fitness_report.docx')
+                writer.add_page(page)
+                text=f'Hello {name1},I am your AI coach and I am happy to inform you that your present weight is {round(starting_weight,2)} kgs your bodyfat Percentage is {bodyfat1} so by  our plan, your final weight after 21 days would be {round(final_weight,2)} kgs.  To achieve this result, you need to walk at least {daily_steps} steps daily and do {exercise} for {plans} daily . This will lead you to burn {daily_steps * 0.05} calories from {daily_steps} steps and by {exercise} for {plans} you will burn {round(exercise_calories,2)} calories. YOUR DAILY CALORIE EXPENDITURE WOULD BE : {round(daily_calorie_deficit,2)}. If you wanna lose {round(round(starting_weight,2)-round(final_weight,2),2)} kgs Read our Weight loss ebook which is completely free for now. Lets work together to help you achieve your weight loss goals!'
+                text += f"1:- In this ebook you will learn what Kind of workouts should do in {exercise}\n"
+                text += f"2:- Plus you will also get insights what should be your diet according to your calories i.e. {round(wl,0)}"
+                writer.update_page_form_field_values(
+                    writer.pages[0], {'uid': uid1,'name': name1,'gender': gen,'age': age,'height': height,'weight': round(starting_weight,2),'bmi': bmi2,'bmr': bmr3,'bf': bodyfat1,'neck': neck,'chest': chest,'abdomen': abdomen,'hip': hip,'sugestion':text})
+                # write "output" to PyPDF2-oužtput.pdf
+                file_path=f'{name1}_Fitness_report.pdf'
+                with open(file_path, "wb") as output_stream:
+                    writer.write(output_stream)
+                with open(file_path, "rb") as f:
+                    pdf_data = f.read()
+                st.download_button('Download PDF', data=pdf_data, file_name=f'{name1}_body_composition.pdf', mime='application/pdf')
                 os.remove(file_path)
+                
+                
+                
+                
+                ###document
             else:
                 random_err = random.randint(0, len(error_msg)-1)
 
