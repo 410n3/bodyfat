@@ -526,7 +526,7 @@ def main():
                 text += f"1:- In this ebook you will learn what Kind of workouts should do in {exercise}\n"
                 text += f"2:- Plus you will also get insights what should be your diet according to your calories i.e. {round(wl,0)}"
                 writer.update_page_form_field_values(
-                    writer.pages[0], {'uid': uid1,'name': name1,'gender': gen,'age': age,'height': height,'weight': round(starting_weight,2),'bmi': bmi2,'bmr': bmr3,'bf': bodyfat1,'neck': neck,'chest': chest,'abdomen': abdomen,'hip': hip,'sugestion':text})
+                    writer.pages[0], {'uid': uid1,'name': name1,'gender': gen,'age': age,'height': height,'weight': round(starting_weight,2),'bmi': round(bmi2,2),'bmr': round(bmr3,2),'bf': bodyfat1,'neck': neck,'chest': chest,'abdomen': abdomen,'hip': hip,'sugestion':text})
                 # write "output" to PyPDF2-oužtput.pdf
                 file_path=f'{name1}_Fitness_report.pdf'
                 with open(file_path, "wb") as output_stream:
