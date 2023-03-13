@@ -411,7 +411,7 @@ def main():
                 hip=df1.loc[0, 'hip']
                 age= df.loc[0, 'Age']
                 height=df.loc[0, 'Height']
-                
+                weight_P=df.loc[0, 'Weight']
 
 
                 starting_weight = df.loc[0, 'Weight']
@@ -503,17 +503,9 @@ def main():
 
             if uid1==id1:
                 st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
-                st.write("***REPORT***")
-                st.write("So ",name1," your bodyfat Percentage is ",bodyfat1)
-                st.write("For results like this you have to walk altleats ",daily_steps," steps daily and do ",exercise,"for ",plans," daily")
-                st.write("This will lead you to burn ",(daily_steps * 0.05)," calories"," from ",daily_steps," steps and by ",exercise,"for ",plans," you will burn ",round(exercise_calories,2)," calories")
-                st.write("***YOUR DAILY CALORIE EXPENDITURE WOULD BE*** :",daily_calorie_deficit )
-                st.write("If you wanna lose ",round(round(starting_weight,2)-round(final_weight,2),2)," kgs Read our Weight loss ebook which is completely free for now")
-                st.write("1:- ***In this ebook you will learn what Kind of workouts shoul do in***",exercise)
-                st.write("2:- ***Plus you will also get insights what should be your diet according to your calories i.e.*** ",round(wl,0))
-                link = "<a href='https://www.dietncity.com' target='_blank'>FREE EBOOK</a>"
-                st.write("Click the link below")
-                st.markdown(link, unsafe_allow_html=True)
+                st.write("Get detailed insight in pdf below")
+                lbm1=(bodyfat1/100)*weight_P
+                lbm1=weight_P-lbm1
                 ##pdf document
                 reader = PdfReader("template.pdf")
                 writer = PdfWriter()
@@ -526,7 +518,7 @@ def main():
                 text += f"1:- In this ebook you will learn what Kind of workouts should do in {exercise}\n"
                 text += f"2:- Plus you will also get insights what should be your diet according to your calories i.e. {round(wl,0)}"
                 writer.update_page_form_field_values(
-                    writer.pages[0], {'uid': uid1,'name': name1,'gender': gen,'age': age,'height': height,'weight': round(starting_weight,2),'bmi': round(bmi2,2),'bmr': round(bmr3,2),'bf': bodyfat1,'neck': neck,'chest': chest,'abdomen': abdomen,'hip': hip,'sugestion':text})
+                    writer.pages[0], {'did': uid1,'name': name1,'gender': gen,'age': age,'height': height,'weight': round(starting_weight,2),'bmi': round(bmi2,2),'bmr': round(bmr3,2),'bf': bodyfat1,'neck': neck,'chest': chest,'abdomen': abdomen,'hip': hip,'suggestion':text,'lbw':lbm1})
                 # write "output" to PyPDF2-oužtput.pdf
                 file_path=f'{name1}_Fitness_report.pdf'
                 with open(file_path, "wb") as output_stream:
