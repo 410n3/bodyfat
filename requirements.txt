@@ -6,6 +6,4 @@ numpy
 scikit_learn
 streamlit
 streamlit_option_menu
-pdfkit
-fpdf
-pypdf
+pdfrw
