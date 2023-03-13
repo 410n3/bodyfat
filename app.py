@@ -17,11 +17,12 @@ from google.oauth2 import service_account
 from pandas import DataFrame
 from gsheetsdb import connect
 import pandas as pd
+import base64
 import random
 import string
 import re
 import os
-from pypdf import PdfReader, PdfWriter
+import pdfrw
 
 
 
@@ -181,8 +182,7 @@ def main():
             href = f'<a href="data:application/octet-stream;base64,{b64}" download="my_edited_document.docx">Download file</a>'
             return href
     
-    
-    
+   
     
     
     
@@ -506,27 +506,50 @@ def main():
                 st.write("Get detailed insight in pdf below")
                 lbm1=(bodyfat1/100)*weight_P
                 lbm1=weight_P-lbm1
+                pdfrw.__version__
+                '0.4'
                 ##pdf document
-                reader = PdfReader("template.pdf")
-                writer = PdfWriter()
-
-                page = reader.pages[0]
+                pdf_template = "template.pdf"
+                pdf_output = f'{name1}_Fitness_report.pdf'
+                template_pdf = pdfrw.PdfReader(pdf_template)
+                ANNOT_KEY = '/Annots'
+                ANNOT_FIELD_KEY = '/T'
+                ANNOT_VAL_KEY = '/V'
+                ANNOT_RECT_KEY = '/Rect'
+                SUBTYPE_KEY = '/Subtype'
+                WIDGET_SUBTYPE_KEY = '/Widget'
                 
-
-                writer.add_page(page)
                 text=f'Hello {name1},I am your AI coach and I am happy to inform you that your present weight is {round(starting_weight,2)} kgs your bodyfat Percentage is {bodyfat1} so by  our plan, your final weight after 21 days would be {round(final_weight,2)} kgs.  To achieve this result, you need to walk at least {daily_steps} steps daily and do {exercise} for {plans} daily . This will lead you to burn {daily_steps * 0.05} calories from {daily_steps} steps and by {exercise} for {plans} you will burn {round(exercise_calories,2)} calories. YOUR DAILY CALORIE EXPENDITURE WOULD BE : {round(daily_calorie_deficit,2)}. If you wanna lose {round(round(starting_weight,2)-round(final_weight,2),2)} kgs Read our Weight loss ebook which is completely free for now. Lets work together to help you achieve your weight loss goals!'
                 text += f"1:- In this ebook you will learn what Kind of workouts should do in {exercise}\n"
                 text += f"2:- Plus you will also get insights what should be your diet according to your calories i.e. {round(wl,0)}"
-                writer.update_page_form_field_values(
-                    writer.pages[0], {'did': uid1,'name': name1,'gender': gen,'age': age,'height': height,'weight': round(starting_weight,2),'bmi': round(bmi2,2),'bmr': round(bmr3,2),'bf': bodyfat1,'neck': neck,'chest': chest,'abdomen': abdomen,'hip': hip,'suggestion':text,'lbw':lbm1})
-                # write "output" to PyPDF2-oužtput.pdf
-                file_path=f'{name1}_Fitness_report.pdf'
-                with open(file_path, "wb") as output_stream:
-                    writer.write(output_stream)
-                with open(file_path, "rb") as f:
+                dict={'did': uid1,'name': name1,'gender': gen,'age': age,'height': height,'weight': round(starting_weight,2),'bmi': round(bmi2,2),'bmr': round(bmr3,2),'bf': bodyfat1,'neck': neck,'chest': chest,'abdomen': abdomen,'hip': hip,'suggestion':text,'lbw':round(lbm1,2)}
+                # using to fill the pdf
+                def fill_pdf(input_pdf_path, output_pdf_path, data_dict):
+                    template_pdf = pdfrw.PdfReader(input_pdf_path)
+                    for page in template_pdf.pages:
+                        annotations = page[ANNOT_KEY]
+                        for annotation in annotations:
+                            if annotation[SUBTYPE_KEY] == WIDGET_SUBTYPE_KEY:
+                                if annotation[ANNOT_FIELD_KEY]:
+                                    key = annotation[ANNOT_FIELD_KEY][1:-1]
+                                    if key in data_dict.keys():
+                                        if type(data_dict[key]) == bool:
+                                            if data_dict[key] == True:
+                                                annotation.update(pdfrw.PdfDict(
+                                                    AS=pdfrw.PdfName('Yes')))
+                                        else:
+                                            annotation.update(
+                                                pdfrw.PdfDict(V='{}'.format(data_dict[key]))
+                                            )
+                                            annotation.update(pdfrw.PdfDict(AP=''))
+                    pdfrw.PdfWriter().write(output_pdf_path, template_pdf)
+                fill_pdf(pdf_template, pdf_output, dict)
+                
+               
+                with open(pdf_output, "rb") as f:
                     pdf_data = f.read()
                 st.download_button('Download PDF', data=pdf_data, file_name=f'{name1}_body_composition.pdf', mime='application/pdf')
-                os.remove(file_path)
+                os.remove(pdf_output)
                 
                 
                 
