@@ -395,7 +395,7 @@ def main():
             
             
             
-            if len(rows1) ==0:
+            if len(rows1)==0 and len(rows)==0:
                 st.warning('No results found. please check your body fat percentage first ')
             else:
                 df1 = DataFrame(rows1, columns=['uid','name','email','age','weight','height','neck','chest','abdomen','hip'])
@@ -506,9 +506,6 @@ def main():
                 st.write("Get detailed insight in pdf below")
                 lbm1=(bodyfat1/100)*weight_P
                 lbm1=weight_P-lbm1
-                pdfrw.__version__
-                '0.4'
-                ##pdf document
                 pdf_template = "template.pdf"
                 pdf_output = f'{name1}_Fitness_report.pdf'
                 template_pdf = pdfrw.PdfReader(pdf_template)
