@@ -395,7 +395,7 @@ def main():
             
             
             
-            if len(rows) & len(rows1) == 0:
+            if len(rows1) ==0:
                 st.warning('No results found. please check your body fat percentage first ')
             else:
                 df1 = DataFrame(rows1, columns=['uid','name','email','age','weight','height','neck','chest','abdomen','hip'])
