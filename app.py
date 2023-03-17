@@ -534,8 +534,7 @@ def main():
                 st.write("Get detailed insight in pdf below")
                 lbm1=(bodyfat1/100)*weight_P
                 lbm1=weight_P-lbm1
-                pdfrw.__version__
-                '0.4'
+                
                 ##pdf document
                 pdf_template = "template.pdf"
                 pdf_output = f'{name1}_Fitness_report.pdf'
