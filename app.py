@@ -408,6 +408,7 @@ def main():
         plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
         exercise = st.radio("Whats your type of workout you plan to do  ", ("High intensity workout", "Low intensity workout", "Moderate intensity workout"))
         id1=st.text_input("Enter your UID number :",max_chars=8)
+        id1=id1.upper()
         email1 = st.text_input('Enter Email:')
         email1=email1.lower()
         
