@@ -145,8 +145,8 @@ def main():
         options=["Predicting Bodyfat percent","Your target Calories intake","21 days weight loss guide"],
         orientation="horizontal"
         )
-    
-   
+
+    ###
     credentials = service_account.Credentials.from_service_account_info(
         st.secrets["gcp_service_account"],
         scopes=[
@@ -181,38 +181,11 @@ def main():
             b64 = base64.b64encode(bytes).decode()
             href = f'<a href="data:application/octet-stream;base64,{b64}" download="my_edited_document.docx">Download file</a>'
             return href
-    ###unit convert 
-    def convert_height(height, unit):
-        if unit == "cm":
-            return height, height/30.48, height/2.54
-        elif unit == "ft":
-            return height*30.48, height, height*12
-        elif unit == "in":
-            return height*2.54, height/12, height
-
-# Weight Conversion Function
-    def convert_weight(weight, unit):
-        if unit == "kg":
-            return weight, weight*2.20462
-        elif unit == "lb":
-            return weight/2.20462, weight
-    with st.sidebar:
-        st.header("Height")
-        height_unit = st.selectbox("Select unit of height:", ["cm", "ft", "in"])
-        height_value = st.number_input("Enter height:", value=0.0, step=0.1)
-        converted_height = convert_height(height_value, height_unit)
-        st.write("Height in cm: ", round(converted_height[0],2))
-        st.write("Height in feet: ", round(converted_height[1],2))
-        st.write("Height in inches: ", round(converted_height[2],2))
     
-        # Weight Input
-        st.header("Weight")
-        weight_unit = st.radio("Select unit of weight:", ["kg", "lb"], index=0)
-        weight_value = st.number_input("Enter weight:", value=0.0, step=0.1)
-        converted_weight = convert_weight(weight_value, weight_unit)
-        st.write("Weight in kg: ", round(converted_weight[0],2))
-        st.write("Weight in lb: ", round(converted_weight[1],2))
-        st.write("")
+   
+    
+    
+    
     
     def generate_id(length=8):
             alphanumeric = string.ascii_uppercase + string.digits
@@ -275,7 +248,6 @@ def main():
         Age = st.text_input("Enter your age:")
         if Age:
             Age = int(Age)
-        st.warning("You can convert Height and Weight values in left sidebar")
         
         Weight = st.text_input("Enter your weight in pounds: ")
         if Weight:
@@ -408,7 +380,6 @@ def main():
         plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
         exercise = st.radio("Whats your type of workout you plan to do  ", ("High intensity workout", "Low intensity workout", "Moderate intensity workout"))
         id1=st.text_input("Enter your UID number :",max_chars=8)
-        id1=id1.upper()
         email1 = st.text_input('Enter Email:')
         email1=email1.lower()
         
@@ -417,8 +388,8 @@ def main():
             rows = conn.execute(query, headers=1)
             rows = rows.fetchall()
             return rows
-        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE uid="{id1}"')
-        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE uid="{id1}"')
+        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"')
+        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE email="{email1}"')
         
         if st.button('Your future'):
             
@@ -505,8 +476,8 @@ def main():
 
             # Calculate final weight
             final_weight = weight_df.iloc[-1]['Weight']
-            
-            email2=df.loc[0, 'email']
+            id1=id1.upper()
+            uid1=df.loc[0, 'uid']
             error_msg = [
                         "INVALID-UID- I'm starting to think that your Invalid UID is my arch-nemesis.",
                         "INVALID-UID- I tried to use your Invalid UID as a password, but apparently it wasn't strong enough, it was mentioned its too easy",
@@ -530,12 +501,13 @@ def main():
                         "INVALID-UID- If you can't remember your UID, I know you might know where you get best burger in town",
                     ]
 
-            if email1==email2:
+            if uid1==id1:
                 st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
                 st.write("Get detailed insight in pdf below")
                 lbm1=(bodyfat1/100)*weight_P
                 lbm1=weight_P-lbm1
-                
+                pdfrw.__version__
+                '0.4'
                 ##pdf document
                 pdf_template = "template.pdf"
                 pdf_output = f'{name1}_Fitness_report.pdf'
