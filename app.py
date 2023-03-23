@@ -416,8 +416,8 @@ def main():
             rows = conn.execute(query, headers=1)
             rows = rows.fetchall()
             return rows
-        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE email="{id1}"')
-        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE email="{id1}"')
+        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE uid="{id1}"')
+        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE uid="{id1}"')
         
         if st.button('Your future'):
             
