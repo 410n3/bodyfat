@@ -416,8 +416,8 @@ def main():
             rows = conn.execute(query, headers=1)
             rows = rows.fetchall()
             return rows
-        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"')
-        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE email="{email1}"')
+        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE email="{id1}"')
+        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE email="{id1}"')
         
         if st.button('Your future'):
             
@@ -504,8 +504,8 @@ def main():
 
             # Calculate final weight
             final_weight = weight_df.iloc[-1]['Weight']
-            id1=id1.upper()
-            uid1=df.loc[0, 'uid']
+            
+            email2=df.loc[0, 'email']
             error_msg = [
                         "INVALID-UID- I'm starting to think that your Invalid UID is my arch-nemesis.",
                         "INVALID-UID- I tried to use your Invalid UID as a password, but apparently it wasn't strong enough, it was mentioned its too easy",
@@ -529,7 +529,7 @@ def main():
                         "INVALID-UID- If you can't remember your UID, I know you might know where you get best burger in town",
                     ]
 
-            if uid1==id1:
+            if email1==email2:
                 st.write("HEY! ",name1,"Your present weight is ",round(starting_weight,2)," kgs and final weight after 21 days according to our plan would be " ,round(final_weight,2) ,"kgs")
                 st.write("Get detailed insight in pdf below")
                 lbm1=(bodyfat1/100)*weight_P
