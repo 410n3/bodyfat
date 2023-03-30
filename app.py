@@ -10,9 +10,7 @@ import streamlit as st
 import pickle
 import math
 from streamlit_option_menu import option_menu
-from sklearn.linear_model import LinearRegression
 import gspread
-import gspread_pandas as gspd
 from google.oauth2 import service_account
 from pandas import DataFrame
 from gsheetsdb import connect
@@ -187,10 +185,10 @@ def main():
     
     
     
-    def generate_id(length=8):
-            alphanumeric = string.ascii_uppercase + string.digits
-            id = ''.join(random.choice(alphanumeric) for _ in range(length))
-            return id
+    def generate_uid(length=8):
+        digits = string.digits
+        uid = ''.join(random.choice(digits) for _ in range(length))
+        return uid
     def classify_body_fat_percentage(gender, body_fat_percentage,bmr):
         if gender == "Female":
             if body_fat_percentage < 14:
@@ -230,12 +228,13 @@ def main():
 
 
     if selected=="Predicting Bodyfat percent":
+        st.warning("This AI body fat calculator is currently in beta stage and may not provide accurate results. The calculator is based on statistical models and may not be suitable for all individuals, especially those with unique body shapes or conditions. Please consult with a medical professional before making any decisions based on the results of this calculator. We are continuously working to improve the accuracy of the calculator, and your feedback is greatly appreciated.")
         st.header("Predicting your bodyfat percentage")
         gender = st.radio("Select your gender", ("Male", "Female"))
         name = st.text_input('Enter your name')
         uid=""
-        uid=generate_id()
-        uid=uid.upper()
+        uid=generate_uid()
+        
         email = st.text_input('Enter your email')
         if email and not validate_email(email):
             st.warning('Please enter a valid email address')
@@ -287,7 +286,7 @@ def main():
         
     if selected=="Your target Calories intake":
         conn = connect(credentials=credentials)
-        
+        st.warning("This AI body fat calculator is currently in beta stage and may not provide accurate results. The calculator is based on statistical models and may not be suitable for all individuals, especially those with unique body shapes or conditions. Please consult with a medical professional before making any decisions based on the results of this calculator. We are continuously working to improve the accuracy of the calculator, and your feedback is greatly appreciated.")
         
 #AND email="{email}"
 # Get user input for ID and email.
@@ -332,12 +331,12 @@ def main():
 # Run the SQL query and display the results.
         if st.button('Your target'):
                 st.experimental_singleton
-                def run_query(email1):
+                def run_query(id1,email1):
                    sheet_url = st.secrets["private_gsheets_url"]
-                   rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"', headers=1)
+                   rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE uid="{id1}" AND email="{email1}"', headers=1)
                    rows = rows.fetchall()
                    return rows
-                rows = run_query(email1)
+                rows = run_query(id1,email1)
                 if len(rows) == 0:
                     st.warning('No results found. please check your body fat percentage first ')
                 else:
@@ -348,7 +347,6 @@ def main():
                     bodyfat1=df.loc[0, 'bodyfat']
                     gen=df.loc[0, 'gender']
                     # create radio button to select fitness goal
-                    id1=id1.upper()
                     uid1=df.loc[0, 'uid']
                     ai_pred=classify_body_fat_percentage(gen,bodyfat1,bmr2)
                     if uid1==id1:# display selected fitness goal
@@ -376,6 +374,7 @@ def main():
 
     if selected=="21 days weight loss guide":
         conn = connect(credentials=credentials)
+        st.warning("This AI body fat calculator is currently in beta stage and may not provide accurate results. The calculator is based on statistical models and may not be suitable for all individuals, especially those with unique body shapes or conditions. Please consult with a medical professional before making any decisions based on the results of this calculator. We are continuously working to improve the accuracy of the calculator, and your feedback is greatly appreciated.")
         st.experimental_singleton
         plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
         exercise = st.radio("Whats your type of workout you plan to do  ", ("High intensity workout", "Low intensity workout", "Moderate intensity workout"))
@@ -388,8 +387,8 @@ def main():
             rows = conn.execute(query, headers=1)
             rows = rows.fetchall()
             return rows
-        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"')
-        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE email="{email1}"')
+        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE uid="{id1}" AND email="{email1}"')
+        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE uid="{id1}" AND email="{email1}"')
         
         if st.button('Your future'):
             
@@ -476,7 +475,6 @@ def main():
 
             # Calculate final weight
             final_weight = weight_df.iloc[-1]['Weight']
-            id1=id1.upper()
             uid1=df.loc[0, 'uid']
             error_msg = [
                         "INVALID-UID- I'm starting to think that your Invalid UID is my arch-nemesis.",
@@ -506,8 +504,7 @@ def main():
                 st.write("Get detailed insight in pdf below")
                 lbm1=(bodyfat1/100)*weight_P
                 lbm1=weight_P-lbm1
-                pdfrw.__version__
-                '0.4'
+                
                 ##pdf document
                 pdf_template = "template.pdf"
                 pdf_output = f'{name1}_Fitness_report.pdf'
