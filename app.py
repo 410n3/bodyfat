@@ -10,7 +10,9 @@ import streamlit as st
 import pickle
 import math
 from streamlit_option_menu import option_menu
+from sklearn.linear_model import LinearRegression
 import gspread
+import gspread_pandas as gspd
 from google.oauth2 import service_account
 from pandas import DataFrame
 from gsheetsdb import connect
@@ -21,6 +23,9 @@ import string
 import re
 import os
 import pdfrw
+import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
 
 
 
@@ -179,16 +184,48 @@ def main():
             b64 = base64.b64encode(bytes).decode()
             href = f'<a href="data:application/octet-stream;base64,{b64}" download="my_edited_document.docx">Download file</a>'
             return href
+        
+    ###unit convert 
+    def convert_height(height, unit):
+        if unit == "cm":
+            return height, height/30.48, height/2.54
+        elif unit == "ft":
+            return height*30.48, height, height*12
+        elif unit == "in":
+            return height*2.54, height/12, height
+# Weight Conversion Function
+    def convert_weight(weight, unit):
+        if unit == "kg":
+            return weight, weight*2.20462
+        elif unit == "lb":
+            return weight/2.20462, weight
+    with st.sidebar:
+        st.header("Height")
+        height_unit = st.selectbox("Select unit of height:", ["cm", "ft", "in"])
+        height_value = st.number_input("Enter height:", value=0.0, step=0.1)
+        converted_height = convert_height(height_value, height_unit)
+        st.write("Height in cm: ", round(converted_height[0],2))
+        st.write("Height in feet: ", round(converted_height[1],2))
+        st.write("Height in inches: ", round(converted_height[2],2))
+    
+        # Weight Input
+        st.header("Weight")
+        weight_unit = st.radio("Select unit of weight:", ["kg", "lb"], index=0)
+        weight_value = st.number_input("Enter weight:", value=0.0, step=0.1)
+        converted_weight = convert_weight(weight_value, weight_unit)
+        st.write("Weight in kg: ", round(converted_weight[0],2))
+        st.write("Weight in lb: ", round(converted_weight[1],2))
+        st.write("")
     
    
     
     
     
     
-    def generate_uid(length=8):
-        digits = string.digits
-        uid = ''.join(random.choice(digits) for _ in range(length))
-        return uid
+    def generate_id(length=8):
+            alphanumeric = string.ascii_uppercase + string.digits
+            id = ''.join(random.choice(alphanumeric) for _ in range(length))
+            return id
     def classify_body_fat_percentage(gender, body_fat_percentage,bmr):
         if gender == "Female":
             if body_fat_percentage < 14:
@@ -228,13 +265,12 @@ def main():
 
 
     if selected=="Predicting Bodyfat percent":
-        st.warning("This AI body fat calculator is currently in beta stage and may not provide accurate results. The calculator is based on statistical models and may not be suitable for all individuals, especially those with unique body shapes or conditions. Please consult with a medical professional before making any decisions based on the results of this calculator. We are continuously working to improve the accuracy of the calculator, and your feedback is greatly appreciated.")
         st.header("Predicting your bodyfat percentage")
         gender = st.radio("Select your gender", ("Male", "Female"))
         name = st.text_input('Enter your name')
         uid=""
-        uid=generate_uid()
-        
+        uid=generate_id()
+        uid=uid.upper()
         email = st.text_input('Enter your email')
         if email and not validate_email(email):
             st.warning('Please enter a valid email address')
@@ -286,7 +322,7 @@ def main():
         
     if selected=="Your target Calories intake":
         conn = connect(credentials=credentials)
-        st.warning("This AI body fat calculator is currently in beta stage and may not provide accurate results. The calculator is based on statistical models and may not be suitable for all individuals, especially those with unique body shapes or conditions. Please consult with a medical professional before making any decisions based on the results of this calculator. We are continuously working to improve the accuracy of the calculator, and your feedback is greatly appreciated.")
+        
         
 #AND email="{email}"
 # Get user input for ID and email.
@@ -299,8 +335,24 @@ def main():
             st.success(f'Email entered: {email1}')
             email1=email1.lower()
         fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
+        nltk.download('vader_lexicon')
+        sia = SentimentIntensityAnalyzer()
+        motivation = st.text_input("What motivates you to lose weight? ",max_chars=100)
+        sentiment_scores = sia.polarity_scores(motivation)
+        if sentiment_scores['compound'] >= 0.5:
+            sentiment_category = "very positive"
+        elif sentiment_scores['compound'] >= 0.05 and sentiment_scores['compound'] < 0.5:
+            sentiment_category = "positive"
+        elif sentiment_scores['compound'] > -0.05 and sentiment_scores['compound'] < 0.05:
+            sentiment_category = "neutral"
+        elif sentiment_scores['compound'] > -0.5 and sentiment_scores['compound'] <= -0.05:
+            sentiment_category = "negative"
+        else:
+            sentiment_category = "very negative"
         
+        st.warning("Based on this statement we pridict your motivation level so write what you feel")
         id1=st.text_input("Enter your UID number :",max_chars=8)
+        
         error_msg2 = [
                     "INVALID-UID- What kind of fitness enthusiast you are that you cant remember your UID then how you gonna remember how much calories you ate",
                     "INVALID-UID- Looks like you're not just losing weight, you're also losing your memory!",
@@ -331,12 +383,12 @@ def main():
 # Run the SQL query and display the results.
         if st.button('Your target'):
                 st.experimental_singleton
-                def run_query(id1,email1):
+                def run_query(email1):
                    sheet_url = st.secrets["private_gsheets_url"]
-                   rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE uid="{id1}" AND email="{email1}"', headers=1)
+                   rows = conn.execute(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"', headers=1)
                    rows = rows.fetchall()
                    return rows
-                rows = run_query(id1,email1)
+                rows = run_query(email1)
                 if len(rows) == 0:
                     st.warning('No results found. please check your body fat percentage first ')
                 else:
@@ -347,6 +399,7 @@ def main():
                     bodyfat1=df.loc[0, 'bodyfat']
                     gen=df.loc[0, 'gender']
                     # create radio button to select fitness goal
+                    id1=id1.upper()
                     uid1=df.loc[0, 'uid']
                     ai_pred=classify_body_fat_percentage(gen,bodyfat1,bmr2)
                     if uid1==id1:# display selected fitness goal
@@ -354,19 +407,35 @@ def main():
                             wl=bmr2-400
                             st.write("HEY! ",name1)
                             st.write("Your bodyfat Percentage is ",bodyfat1)
+                            
                             st.write("You have selected weight loss and your bmr is ",round(bmr2,2),"You have eat upto ",round(wl),"calories")
-                            st.success(f'According to our AI : {name1} your aim should be {ai_pred}')
+                            st.success(f'According to our AI : {name1} your aim should be {ai_pred} ')
+                            if sentiment_scores['compound'] >= 0.05:
+                                st.success("Positive sentiment can help you stay motivated and focused on your weight loss journey!")
+                            else:
+                                st.success("It can be challenging to stay motivated with a negative sentiment, but remember that small steps can lead to big changes.")
+
                         elif fitness_goal == "Weight Gain":
                             wg=bmr2+400
                             st.write("HEY! ",name1)
                             st.write("Your bodyfat Percentage is ",bodyfat1)
                             st.write("You have selected weight gain and your bmr is ",round(bmr2,2),"You have eat atleast ",round(wg),"calories")
                             st.success(f'According to our AI : {name1} your aim should be {ai_pred}')
+                            if sentiment_scores['compound'] >= 0.05:
+                                st.success("Positive sentiment can help you stay motivated and focused on your weight loss journey!")
+                            else:
+                                st.success("It can be challenging to stay motivated with a negative sentiment, but remember that small steps can lead to big changes.")
+
                         else:
                             st.write("HEY! ",name1)
                             st.write("Your bodyfat Percentage is ",bodyfat1)
                             st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2),"calories")
                             st.success(f'According to our AI : {name1} your aim should be {ai_pred}')
+                            if sentiment_scores['compound'] >= 0.05:
+                                st.success("Positive sentiment can help you stay motivated and focused on your weight loss journey!")
+                            else:
+                                st.success("It can be challenging to stay motivated with a negative sentiment, but remember that small steps can lead to big changes.")
+
                     else:
                         random_err = random.randint(0, len(error_msg2)-1)
                         st.warning(error_msg2[random_err])
@@ -374,7 +443,6 @@ def main():
 
     if selected=="21 days weight loss guide":
         conn = connect(credentials=credentials)
-        st.warning("This AI body fat calculator is currently in beta stage and may not provide accurate results. The calculator is based on statistical models and may not be suitable for all individuals, especially those with unique body shapes or conditions. Please consult with a medical professional before making any decisions based on the results of this calculator. We are continuously working to improve the accuracy of the calculator, and your feedback is greatly appreciated.")
         st.experimental_singleton
         plans = st.radio("Select your workout goal:", ("30 mins", "45 mins", "60 mins"))
         exercise = st.radio("Whats your type of workout you plan to do  ", ("High intensity workout", "Low intensity workout", "Moderate intensity workout"))
@@ -387,8 +455,8 @@ def main():
             rows = conn.execute(query, headers=1)
             rows = rows.fetchall()
             return rows
-        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE uid="{id1}" AND email="{email1}"')
-        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE uid="{id1}" AND email="{email1}"')
+        rows = run_query(f'SELECT * FROM "{sheet_url}" WHERE email="{email1}"')
+        rows1 = run_query(f'SELECT * FROM "{sheet_url_ui}" WHERE email="{email1}"')
         
         if st.button('Your future'):
             
@@ -475,6 +543,7 @@ def main():
 
             # Calculate final weight
             final_weight = weight_df.iloc[-1]['Weight']
+            id1=id1.upper()
             uid1=df.loc[0, 'uid']
             error_msg = [
                         "INVALID-UID- I'm starting to think that your Invalid UID is my arch-nemesis.",
