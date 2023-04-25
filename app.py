@@ -199,23 +199,7 @@ def main():
             return weight, weight*2.20462
         elif unit == "lb":
             return weight/2.20462, weight
-    with st.sidebar:
-        st.header("Height")
-        height_unit = st.selectbox("Select unit of height:", ["cm", "ft", "in"])
-        height_value = st.number_input("Enter height:", value=0.0, step=0.1)
-        converted_height = convert_height(height_value, height_unit)
-        st.write("Height in cm: ", round(converted_height[0],2))
-        st.write("Height in feet: ", round(converted_height[1],2))
-        st.write("Height in inches: ", round(converted_height[2],2))
     
-        # Weight Input
-        st.header("Weight")
-        weight_unit = st.radio("Select unit of weight:", ["kg", "lb"], index=0)
-        weight_value = st.number_input("Enter weight:", value=0.0, step=0.1)
-        converted_weight = convert_weight(weight_value, weight_unit)
-        st.write("Weight in kg: ", round(converted_weight[0],2))
-        st.write("Weight in lb: ", round(converted_weight[1],2))
-        st.write("")
     
    
     
@@ -283,12 +267,31 @@ def main():
         Age = st.text_input("Enter your age:")
         if Age:
             Age = int(Age)
-        
         Weight = st.text_input("Enter your weight in pounds: ")
+        with st.expander("Convert your Weight", expanded=False):
+            st.header("Weight")
+            weight_unit = st.selectbox("Select unit of weight:", ["kg", "lb"])
+            weight_value = st.number_input("Enter weight:", value=0.0, step=0.1)
+            converted_weight = convert_weight(weight_value, weight_unit)
+            st.write("Weight in kg: ", round(converted_weight[0],2))
+            st.write("Weight in lb: ", round(converted_weight[1],2))
+            st.write("")
+        
         if Weight:
             Weight = float(Weight)
         
+        
+           
+        
         Height = st.text_input("Enter your height in inches : ")
+        with st.expander("Convert your Height", expanded=False):
+            st.header("Height")
+            height_unit = st.selectbox("Select unit of height:", ["cm", "ft", "in"])
+            height_value = st.number_input("Enter height:", value=0.0, step=0.1)
+            converted_height = convert_height(height_value, height_unit)
+            st.write("Height in cm: ", round(converted_height[0],2))
+            st.write("Height in feet: ", round(converted_height[1],2))
+            st.write("Height in inches: ", round(converted_height[2],2))
         if Height:
             Height = float(Height)
         
