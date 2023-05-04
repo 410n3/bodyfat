@@ -216,22 +216,22 @@ def main():
     # Define a function to ask for the user's weight
     def ask_weight(age):
         message("Great! What's your weight in pounds?")
-        weight = st.text_input("Weight:", key="ask_weight", on_change=lambda: st.experimental_set_query_params(position="ask_height"))
+        weight = st.text_input("Weight in pounds:", key="ask_weight", on_change=lambda: st.experimental_set_query_params(position="ask_height"))
         if weight:
             weight = float(weight)
         return weight
 
     # Define a function to ask for the user's height
     def ask_height(weight):
-        message("Awesome! What's your height in inches?")
-        height = st.text_input("Height:", key="ask_height", on_change=lambda: st.experimental_set_query_params(position="ask_neck"))
+        message("How tall are you in inches, my friend?")
+        height = st.text_input("Height in inches:", key="ask_height", on_change=lambda: st.experimental_set_query_params(position="ask_neck"))
         if height:
             height = float(height)
         return height
 
     # Define a function to ask for the user's neck measurement
     def ask_neck(height):
-        message("Excellent! What's your neck measurement in cms?")
+        message("Fantastic! Could you please tell me the measurement around your neck in cms?")
         neck = st.text_input("Neck in CM:", key="ask_neck", on_change=lambda: st.experimental_set_query_params(position="ask_chest"))
         if neck:
             neck = float(neck)
@@ -239,7 +239,7 @@ def main():
 
     # Define a function to ask for the user's chest measurement
     def ask_chest(neck):
-        message("Excellent! What's your chest measurement in cms?")
+        message("Nice one! Can you tell me your chest measurement in cms")
         chest = st.text_input("Chest in CM:", key="ask_chest", on_change=lambda: st.experimental_set_query_params(position="ask_abdomen"))
         if chest:
             chest = float(chest)
@@ -247,7 +247,7 @@ def main():
 
     # Define a function to ask for the user's abdomen measurement
     def ask_abdomen(chest):
-        message("Great! What's your abdomen measurement in cms?")
+        message("Alright, let's get to know that jelly belly of yours! What's the circumference of your tummy in cms?")
         abdomen = st.text_input("Abdomen in CM:", key="ask_abdomen", on_change=lambda: st.experimental_set_query_params(position="ask_hip"))
         if abdomen:
             abdomen = float(abdomen)
@@ -255,7 +255,7 @@ def main():
 
     # Define a function to ask for the user's hip measurement
     def ask_hip(abdomen):
-        message("Great! What's your hip measurement in cms?")
+        message("Woo hoo! Time to measure those hips, partner! How many centimeters are we talking here?")
         hip = st.text_input("Hip in CM:", key="ask_hip")
         if hip:
             hip = float(hip)
