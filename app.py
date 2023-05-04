@@ -352,61 +352,53 @@ def main():
                 "Your virtual fitness buddy is online and ready to whip you into shape!",
                 ]
         random_reply = random.randint(0, len(reply)-1)
-        
-        st.error(reply[random_reply])
-        st.warning("Our body fat AI calculator and fitness assistant is currently in beta stage. While we've done our best to ensure accuracy, please keep in mind that individual results may vary. We appreciate your patience and understanding as we continue to improve and refine our tool!")
-        name = ask_name()
-        if name:
-            Age = ask_age(name)
-            if Age:
-                Weight = ask_weight(Age)
-                with st.expander("Convert your Weight", expanded=False):
-                    st.header("Weight")
-                    weight_unit = st.selectbox("Select unit of weight:", ["kg", "lb"])
-                    weight_value = st.number_input("Enter weight:", value=0.0, step=0.1)
-                    converted_weight = convert_weight(weight_value, weight_unit)
-                    st.write("Weight in kg: ", round(converted_weight[0],2))
-                    st.write("Weight in lb: ", round(converted_weight[1],2))
-                if Weight:
-                    Height = ask_height(Weight)
-                    with st.expander("Convert your Height", expanded=False):
-                        st.header("Height")
-                        height_unit = st.selectbox("Select unit of height:", ["cm", "ft", "in"])
-                        height_value = st.number_input("Enter height:", value=0.0, step=0.1)
-                        converted_height = convert_height(height_value, height_unit)
-                        st.write("Height in cm: ", round(converted_height[0],2))
-                        st.write("Height in feet: ", round(converted_height[1],2))
-                        st.write("Height in inches: ", round(converted_height[2],2))
-                    if Height:
-                        Neck = ask_neck(Height)
-                        if Neck:
-                            Chest = ask_chest(Neck)
-                            if Chest:
-                                Abdomen = ask_abdomen(Chest)
-                                if Abdomen:
-                                    Hip = ask_hip(Abdomen)
-                                
-    
-        
-        
-        
+        if email:
+            st.error(reply[random_reply])
+            st.warning("Our body fat AI calculator and fitness assistant is currently in beta stage. While we've done our best to ensure accuracy, please keep in mind that individual results may vary. We appreciate your patience and understanding as we continue to improve and refine our tool!")
+            name = ask_name()
+            if name:
+                Age = ask_age(name)
+                if Age:
+                    Weight = ask_weight(Age)
+                    with st.expander("Convert your Weight", expanded=False):
+                        st.header("Weight")
+                        weight_unit = st.selectbox("Select unit of weight:", ["kg", "lb"])
+                        weight_value = st.number_input("Enter weight:", value=0.0, step=0.1)
+                        converted_weight = convert_weight(weight_value, weight_unit)
+                        st.write("Weight in kg: ", round(converted_weight[0],2))
+                        st.write("Weight in lb: ", round(converted_weight[1],2))
+                    if Weight:
+                        Height = ask_height(Weight)
+                        with st.expander("Convert your Height", expanded=False):
+                            st.header("Height")
+                            height_unit = st.selectbox("Select unit of height:", ["cm", "ft", "in"])
+                            height_value = st.number_input("Enter height:", value=0.0, step=0.1)
+                            converted_height = convert_height(height_value, height_unit)
+                            st.write("Height in cm: ", round(converted_height[0],2))
+                            st.write("Height in feet: ", round(converted_height[1],2))
+                            st.write("Height in inches: ", round(converted_height[2],2))
+                        if Height:
+                            Neck = ask_neck(Height)
+                            if Neck:
+                                Chest = ask_chest(Neck)
+                                if Chest:
+                                    Abdomen = ask_abdomen(Chest)
+                                    if Abdomen:
+                                        Hip = ask_hip(Abdomen)
+                                    if name and Age and Weight and Height and Neck and Chest and Abdomen and Hip:
+                                        message("Thank you for providing all your measurements! We will process the data and provide you with the relevant information soon.")
+                                        if st.button('Calculate Body fat percentage'):
+                                               bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip)
+                                               st.write('Your Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
+                                               st.write('Your Bodyfat percetage is :',round(bf2,2))
+                                               st.write('Your BMI is :',round(bmi1,1))
+                                               st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
+                                               st.write('Your BMR  is :',round(bmr1,2))
+                                               insert_row(uid,gender, name,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+                                               insert_row_ui(uid,name, email, Age, Weight, Height, Neck, Chest, Abdomen, Hip)
+                                    else:
+                                        st.write("Please fill in all the details to calculate your body fat percentage.")
                 
-        
-        
-    if name and Age and Weight and Height and Neck and Chest and Abdomen and Hip:
-        message("Thank you for providing all your measurements! We will process the data and provide you with the relevant information soon.")
-        if st.button('Calculate Body fat percentage'):
-               bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip)
-               st.write('Your Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
-               st.write('Your Bodyfat percetage is :',round(bf2,2))
-               st.write('Your BMI is :',round(bmi1,1))
-               st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
-               st.write('Your BMR  is :',round(bmr1,2))
-               insert_row(uid,gender, name,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
-               insert_row_ui(uid,name, email, Age, Weight, Height, Neck, Chest, Abdomen, Hip)
-    else:
-        st.write("Please fill in all the details to calculate your body fat percentage.")
-            
         
     if selected=="Your target Calories intake":
         conn = connect(credentials=credentials)
