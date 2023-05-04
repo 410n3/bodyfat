@@ -23,10 +23,8 @@ import string
 import re
 import os
 import pdfrw
-import nltk
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-
-
+from streamlit_chat import message
+import time
 
 
 
@@ -185,6 +183,83 @@ def main():
             href = f'<a href="data:application/octet-stream;base64,{b64}" download="my_edited_document.docx">Download file</a>'
             return href
         
+    ai_name="FitGinie"
+    askname = [
+    f"Hi there! I'm {ai_name}. What's your name, fitness warrior?",
+    "Hello! I'm your personal fitness assistant. What can I call you?",
+    f"Greetings, earthling! My name is {ai_name}. And yours?",
+    "Welcome to the bodyfat calculator! What's your name, gym guru?",
+    f"Namaste! I'm {ai_name}, here to help you get fit. What's your name?",
+    "Hey there! I'm your new virtual personal trainer. What should I call you?",
+    f"Greetings, human! I am {ai_name}, your fitness companion. What's your name?",
+    "Yo, what's up? I'm the AI bodyfat calculator. And you are...?",
+    f"Hi! I'm {ai_name}, your personal health assistant. What's your name, champ?",
+    "Hiya! I'm the bodyfat calculator. What do I call you, fitness fanatic?"
+    ]
+  
+    
+    # Define a function to ask for the user's name
+    def ask_name():
+        random_name = random.randint(0, len(askname)-1)
+        message(askname[random_name])
+        name = st.text_input("Your Name:", key="name_input", on_change=lambda: st.experimental_set_query_params(position="age_input"))
+        return name
+
+    # Define a function to ask for the user's age
+    def ask_age(name):
+        message("Thanks, {}. How old are you?".format(name))
+        age = st.text_input("Your Age:", key="age_input", on_change=lambda: st.experimental_set_query_params(position="ask_weight"))
+        if age:
+            age = int(age)
+        return age
+
+    # Define a function to ask for the user's weight
+    def ask_weight(age):
+        message("Great! What's your weight in pounds?")
+        weight = st.text_input("Weight:", key="ask_weight", on_change=lambda: st.experimental_set_query_params(position="ask_height"))
+        if weight:
+            weight = float(weight)
+        return weight
+
+    # Define a function to ask for the user's height
+    def ask_height(weight):
+        message("Awesome! What's your height in inches?")
+        height = st.text_input("Height:", key="ask_height", on_change=lambda: st.experimental_set_query_params(position="ask_neck"))
+        if height:
+            height = float(height)
+        return height
+
+    # Define a function to ask for the user's neck measurement
+    def ask_neck(height):
+        message("Excellent! What's your neck measurement in cms?")
+        neck = st.text_input("Neck in CM:", key="ask_neck", on_change=lambda: st.experimental_set_query_params(position="ask_chest"))
+        if neck:
+            neck = float(neck)
+        return neck
+
+    # Define a function to ask for the user's chest measurement
+    def ask_chest(neck):
+        message("Excellent! What's your chest measurement in cms?")
+        chest = st.text_input("Chest in CM:", key="ask_chest", on_change=lambda: st.experimental_set_query_params(position="ask_abdomen"))
+        if chest:
+            chest = float(chest)
+        return chest
+
+    # Define a function to ask for the user's abdomen measurement
+    def ask_abdomen(chest):
+        message("Great! What's your abdomen measurement in cms?")
+        abdomen = st.text_input("Abdomen in CM:", key="ask_abdomen", on_change=lambda: st.experimental_set_query_params(position="ask_hip"))
+        if abdomen:
+            abdomen = float(abdomen)
+        return abdomen
+
+    # Define a function to ask for the user's hip measurement
+    def ask_hip(abdomen):
+        message("Great! What's your hip measurement in cms?")
+        hip = st.text_input("Hip in CM:", key="ask_hip")
+        if hip:
+            hip = float(hip)
+        return hip
     ###unit convert 
     def convert_height(height, unit):
         if unit == "cm":
@@ -201,7 +276,15 @@ def main():
             return weight/2.20462, weight
     
     
-   
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -251,77 +334,79 @@ def main():
     if selected=="Predicting Bodyfat percent":
         st.header("Predicting your bodyfat percentage")
         gender = st.radio("Select your gender", ("Male", "Female"))
-        name = st.text_input('Enter your name')
         uid=""
         uid=generate_id()
         uid=uid.upper()
         email = st.text_input('Enter your email')
         if email and not validate_email(email):
             st.warning('Please enter a valid email address')
-
-        # Display email to user
-        if email:
-            st.success(f'Email entered: {email}')
-
-        email=email.lower()
-        Age = st.text_input("Enter your age:")
-        if Age:
-            Age = int(Age)
-        Weight = st.text_input("Enter your weight in pounds: ")
-        with st.expander("Convert your Weight", expanded=False):
-            st.header("Weight")
-            weight_unit = st.selectbox("Select unit of weight:", ["kg", "lb"])
-            weight_value = st.number_input("Enter weight:", value=0.0, step=0.1)
-            converted_weight = convert_weight(weight_value, weight_unit)
-            st.write("Weight in kg: ", round(converted_weight[0],2))
-            st.write("Weight in lb: ", round(converted_weight[1],2))
-            st.write("")
+        reply=["Starting up your personal AI gym buddy!",
+                "Get ready to sweat with your digital fitness motivator!",
+                "Strap on your gym shoes, we're firing up your virtual fitness companion!",
+                "Get ready to feel the burn, we're launching your very own AI personal trainer!",
+                "Get pumped, your digital workout partner is about to come alive!",
+                "Rise and shine, it's time to wake up your AI fitness buddy!",
+                "Let's get this workout party started with your very own AI gym partner!",
+                "Buckle up and hold on tight, your AI fitness guru is ready to roll!",
+                "We're about to unleash your personal digital fitness coach, get ready!",
+                "Your virtual fitness buddy is online and ready to whip you into shape!",
+                ]
+        random_reply = random.randint(0, len(reply)-1)
         
-        if Weight:
-            Weight = float(Weight)
+        st.error(reply[random_reply])
+        st.warning("Our body fat AI calculator and fitness assistant is currently in beta stage. While we've done our best to ensure accuracy, please keep in mind that individual results may vary. We appreciate your patience and understanding as we continue to improve and refine our tool!")
+        name = ask_name()
+        if name:
+            Age = ask_age(name)
+            if Age:
+                Weight = ask_weight(Age)
+                with st.expander("Convert your Weight", expanded=False):
+                    st.header("Weight")
+                    weight_unit = st.selectbox("Select unit of weight:", ["kg", "lb"])
+                    weight_value = st.number_input("Enter weight:", value=0.0, step=0.1)
+                    converted_weight = convert_weight(weight_value, weight_unit)
+                    st.write("Weight in kg: ", round(converted_weight[0],2))
+                    st.write("Weight in lb: ", round(converted_weight[1],2))
+                if Weight:
+                    Height = ask_height(Weight)
+                    with st.expander("Convert your Height", expanded=False):
+                        st.header("Height")
+                        height_unit = st.selectbox("Select unit of height:", ["cm", "ft", "in"])
+                        height_value = st.number_input("Enter height:", value=0.0, step=0.1)
+                        converted_height = convert_height(height_value, height_unit)
+                        st.write("Height in cm: ", round(converted_height[0],2))
+                        st.write("Height in feet: ", round(converted_height[1],2))
+                        st.write("Height in inches: ", round(converted_height[2],2))
+                    if Height:
+                        Neck = ask_neck(Height)
+                        if Neck:
+                            Chest = ask_chest(Neck)
+                            if Chest:
+                                Abdomen = ask_abdomen(Chest)
+                                if Abdomen:
+                                    Hip = ask_hip(Abdomen)
+                                
+    
         
-        
-           
-        
-        Height = st.text_input("Enter your height in inches : ")
-        with st.expander("Convert your Height", expanded=False):
-            st.header("Height")
-            height_unit = st.selectbox("Select unit of height:", ["cm", "ft", "in"])
-            height_value = st.number_input("Enter height:", value=0.0, step=0.1)
-            converted_height = convert_height(height_value, height_unit)
-            st.write("Height in cm: ", round(converted_height[0],2))
-            st.write("Height in feet: ", round(converted_height[1],2))
-            st.write("Height in inches: ", round(converted_height[2],2))
-        if Height:
-            Height = float(Height)
-        
-        Neck = st.text_input("Enter your neck in cm : ")
-        if Neck:
-            Neck = float(Neck)
-        
-        Chest = st.text_input("Enter your chest in cm : ")
-        if Chest:
-            Chest = float(Chest)
-        
-        Abdomen = st.text_input("Enter your abdomen in cm : ")
-        if Abdomen:
-            Abdomen = float(Abdomen)
-        
-        Hip = st.text_input("Enter your hip in cm : ")
-        if Hip:
-            Hip = float(Hip)
         
         
                 
+        
+        
+    if name and Age and Weight and Height and Neck and Chest and Abdomen and Hip:
+        message("Thank you for providing all your measurements! We will process the data and provide you with the relevant information soon.")
         if st.button('Calculate Body fat percentage'):
-            bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip)
-            st.write('Your Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
-            st.write('Your Bodyfat percetage is :',round(bf2,2))
-            st.write('Your BMI is :',round(bmi1,1))
-            st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
-            st.write('Your BMR  is :',round(bmr1,2))
-            insert_row(uid,gender, name,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
-            insert_row_ui(uid,name, email, Age, Weight, Height, Neck, Chest, Abdomen, Hip)
+               bf2,bmi1,bf1,bmr1=bodyfat(gender,Age,Weight,Height,Neck,Chest,Abdomen,Hip)
+               st.write('Your Unique ID is (***SAVE THIS SOMEWHERE***) :',uid)
+               st.write('Your Bodyfat percetage is :',round(bf2,2))
+               st.write('Your BMI is :',round(bmi1,1))
+               st.write('Your Bodyfat percetage according to BMI is :',round(bf1,2))
+               st.write('Your BMR  is :',round(bmr1,2))
+               insert_row(uid,gender, name,email, Age, Weight, Height, bmi1, bmr1, bf2, bf1)
+               insert_row_ui(uid,name, email, Age, Weight, Height, Neck, Chest, Abdomen, Hip)
+    else:
+        st.write("Please fill in all the details to calculate your body fat percentage.")
+            
         
     if selected=="Your target Calories intake":
         conn = connect(credentials=credentials)
@@ -338,24 +423,8 @@ def main():
             st.success(f'Email entered: {email1}')
             email1=email1.lower()
         fitness_goal = st.radio("Select your fitness goal:", ("Weight Loss", "Weight Gain", "Weight Maintenance"))
-        nltk.download('vader_lexicon')
-        sia = SentimentIntensityAnalyzer()
-        motivation = st.text_input("What motivates you to lose weight? ",max_chars=100)
-        sentiment_scores = sia.polarity_scores(motivation)
-        if sentiment_scores['compound'] >= 0.5:
-            sentiment_category = "very positive"
-        elif sentiment_scores['compound'] >= 0.05 and sentiment_scores['compound'] < 0.5:
-            sentiment_category = "positive"
-        elif sentiment_scores['compound'] > -0.05 and sentiment_scores['compound'] < 0.05:
-            sentiment_category = "neutral"
-        elif sentiment_scores['compound'] > -0.5 and sentiment_scores['compound'] <= -0.05:
-            sentiment_category = "negative"
-        else:
-            sentiment_category = "very negative"
         
-        st.warning("Based on this statement we pridict your motivation level so write what you feel")
         id1=st.text_input("Enter your UID number :",max_chars=8)
-        
         error_msg2 = [
                     "INVALID-UID- What kind of fitness enthusiast you are that you cant remember your UID then how you gonna remember how much calories you ate",
                     "INVALID-UID- Looks like you're not just losing weight, you're also losing your memory!",
@@ -410,35 +479,19 @@ def main():
                             wl=bmr2-400
                             st.write("HEY! ",name1)
                             st.write("Your bodyfat Percentage is ",bodyfat1)
-                            
                             st.write("You have selected weight loss and your bmr is ",round(bmr2,2),"You have eat upto ",round(wl),"calories")
-                            st.success(f'According to our AI : {name1} your aim should be {ai_pred} ')
-                            if sentiment_scores['compound'] >= 0.05:
-                                st.success("Positive sentiment can help you stay motivated and focused on your weight loss journey!")
-                            else:
-                                st.success("It can be challenging to stay motivated with a negative sentiment, but remember that small steps can lead to big changes.")
-
+                            st.success(f'According to our AI : {name1} your aim should be {ai_pred}')
                         elif fitness_goal == "Weight Gain":
                             wg=bmr2+400
                             st.write("HEY! ",name1)
                             st.write("Your bodyfat Percentage is ",bodyfat1)
                             st.write("You have selected weight gain and your bmr is ",round(bmr2,2),"You have eat atleast ",round(wg),"calories")
                             st.success(f'According to our AI : {name1} your aim should be {ai_pred}')
-                            if sentiment_scores['compound'] >= 0.05:
-                                st.success("Positive sentiment can help you stay motivated and focused on your weight loss journey!")
-                            else:
-                                st.success("It can be challenging to stay motivated with a negative sentiment, but remember that small steps can lead to big changes.")
-
                         else:
                             st.write("HEY! ",name1)
                             st.write("Your bodyfat Percentage is ",bodyfat1)
                             st.write("You have selected weight maintan and your bmr is ",round(bmr2,2),"You have eat exact ",round(bmr2,2),"calories")
                             st.success(f'According to our AI : {name1} your aim should be {ai_pred}')
-                            if sentiment_scores['compound'] >= 0.05:
-                                st.success("Positive sentiment can help you stay motivated and focused on your weight loss journey!")
-                            else:
-                                st.success("It can be challenging to stay motivated with a negative sentiment, but remember that small steps can lead to big changes.")
-
                     else:
                         random_err = random.randint(0, len(error_msg2)-1)
                         st.warning(error_msg2[random_err])
